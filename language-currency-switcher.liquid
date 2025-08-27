@@ -1,0 +1,74 @@
+<!-- Currency switcher (your exact code) -->
+<div class="footer-col footer-col--localization">
+  <div class="custom-currency-bar" id="FooterCurrency-{{ section.id }}">
+    {%- if localization.available_countries.size > 1 -%}
+      <localization-form data-prevent-hide>
+        {%- form 'localization', id: 'FooterCountryForm', class: 'localization-form' -%}
+          <div>
+            <h2 class="visually-hidden" id="FooterCountryLabel">
+              {{ 'localization.country_label' | t }}
+            </h2>
+            {%- render 'country-localization', localPosition: 'FooterCountry' -%}
+          </div>
+        {%- endform -%}
+      </localization-form>
+    {%- endif -%}
+  </div>
+</div>
+
+<style>
+
+/* Footer currency dropdown look */
+.custom-currency-bar .disclosure__button{
+  background:#000;
+  color:#fff;
+  border:1px solid #fff;
+  border-radius:20px;
+  padding:8px 12px;
+  line-height:1;
+  display:flex; align-items:center; gap:6px;
+}
+.custom-currency-bar .disclosure__button .icon-caret{
+  width:12px; transition:transform .3s ease; color:#fff;
+}
+.custom-currency-bar .disclosure__button[aria-expanded="true"] .icon-caret{
+  transform:rotate(180deg);
+}
+.localization-form__select:after {
+    box-shadow: none !important;
+}
+/* Dropdown panel */
+.custom-currency-bar .disclosure__list-wrapper{
+  background:#1f58ad;               /* black dropdown */
+  border:1px solid #fff;         /* white border */
+  border-radius:20px;            /* 20px radius */
+  padding:6px;
+  margin-top:8px;
+  z-index:60;
+}
+
+/* Options (transparent background) */
+.custom-currency-bar .disclosure__list{ background:transparent; }
+.custom-currency-bar .disclosure__item{ list-style:none; }
+.custom-currency-bar .disclosure__link{
+  display:block;
+  color:#fff;
+  background:transparent !important;  /* transparent option rows */
+  padding:8px 12px;
+  text-decoration:none;
+  border-radius:12px; /* keeps nice focus ring shape */
+}
+.custom-currency-bar .disclosure__link:hover,
+.custom-currency-bar .disclosure__link:focus{
+  background:transparent !important;  /* keep transparent on hover */
+  text-decoration:underline;
+}
+
+/* Icons inside list to white */
+.custom-currency-bar .icon-checkmark{ color:#fff; }
+
+/* Optional: remove full-screen overlay if your snippet adds it */
+.custom-currency-bar .country-selector__overlay{ display:none; }
+
+
+</style>
