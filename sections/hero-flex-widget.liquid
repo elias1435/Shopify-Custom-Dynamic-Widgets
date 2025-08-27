@@ -1,0 +1,294 @@
+{% comment %}
+  File: sections/hero-flex-widget.liquid
+  Purpose: Highly-configurable hero/CTA with gradient or solid background, 2 buttons, and 3-item horizontal list.
+  Notes: No external JS; responsive; uses CSS vars derived from settings.
+{% endcomment %}
+
+<section
+  id="hero-flex-widget-{{ section.id }}"
+  class="hero-flex-widget"
+  style="
+    --hero-px: {{ section.settings.pad_x | default: 24 }}px;
+    --hero-pt: {{ section.settings.pad_t | default: 60 }}px;
+    --hero-pb: {{ section.settings.pad_b | default: 60 }}px;
+    --hero-radius: {{ section.settings.radius | default: 16 }}px;
+    --hero-maxw: {{ section.settings.max_width | default: 1000 }}px;
+    --hero-title-size: {{ section.settings.title_size | default: 48 }}px;
+    --hero-title-weight: {{ section.settings.title_weight | default: 700 }};
+    --hero-body-size: {{ section.settings.body_size | default: 18 }}px;
+    --hero-body-weight: {{ section.settings.body_weight | default: 400 }};
+    --hero-title-color: {{ section.settings.title_color }};
+    --hero-body-color: {{ section.settings.body_color }};
+    --hero-fill-bg: {{ section.settings.btn_fill_bg }};
+    --hero-fill-text: {{ section.settings.btn_fill_text }};
+    --hero-outline-text: {{ section.settings.btn_outline_text }};
+    --hero-outline-border: {{ section.settings.btn_outline_border }};
+    --hero-bullet-color: {{ section.settings.bullet_color }};
+    --hero-card-bg: {% if section.settings.card_bg != blank %}{{ section.settings.card_bg }}{% else %}transparent{% endif %};
+    {% if section.settings.bg_type == 'solid' %}
+      --hero-bg: {{ section.settings.bg_solid }};
+    {% else %}
+    {%- comment -%}
+        grad_angle is a 0–100 slider; convert to degrees (0–360)
+    {%- endcomment -%}
+      {% assign angle = section.settings.grad_angle | times: 3.6 | round: 1 %}
+      {% assign startc = section.settings.grad_start_color | default: '#ffffff' %}
+      {% assign endc = section.settings.grad_end_color | default: '#f5f5f5' %}
+      {% assign startp = section.settings.grad_start_pos | default: 0 %}
+      {% assign endp = section.settings.grad_end_pos | default: 100 %}
+      --hero-bg: {{ section.settings.grad_type }}-gradient({{ angle }}deg, {{ startc }} {{ startp }}%, {{ endc }} {{ endp }}%);
+    {% endif %}
+    --hero-shadow: {% if section.settings.enable_shadow %}0 10px 30px rgba(0,0,0,.08){% else %}none{% endif %};
+    text-align: {{ section.settings.alignment }};
+  "
+>
+  <div class="hero-inner page-width {% if section.settings.constrain %}hero-constrain{% endif %}">
+    <div class="hero-card">
+      {% if section.settings.title != blank %}
+        <h2 class="hero-title">{{ section.settings.title }}</h2>
+      {% endif %}
+
+      {% if section.settings.body != blank %}
+        <div class="hero-body rte">{{ section.settings.body }}</div>
+      {% endif %}
+
+      {% if section.settings.show_buttons %}
+        <div class="hero-actions">
+          {% if section.settings.btn_fill_label != blank and section.settings.btn_fill_url != blank %}
+            <a class="hero-btn hero-btn--fill"
+               href="{{ section.settings.btn_fill_url }}"
+               {% if section.settings.btn_fill_newtab %}target="_blank" rel="noopener"{% endif %}>
+              {{ section.settings.btn_fill_label }}
+            </a>
+          {% endif %}
+          {% if section.settings.btn_outline_label != blank and section.settings.btn_outline_url != blank %}
+            <a class="hero-btn hero-btn--outline"
+               href="{{ section.settings.btn_outline_url }}"
+               {% if section.settings.btn_outline_newtab %}target="_blank" rel="noopener"{% endif %}>
+              {{ section.settings.btn_outline_label }}
+            </a>
+          {% endif %}
+        </div>
+      {% endif %}
+
+      {% if section.blocks.size > 0 %}
+        <ul class="hero-list">
+          {% for block in section.blocks %}
+            {% if block.type == 'feature' %}
+              <li class="hero-list-item" {{ block.shopify_attributes }}>
+                <span class="hero-bullet" style="background: {{ block.settings.bullet_color | default: section.settings.bullet_color }};"></span>
+                <span class="hero-list-text">{{ block.settings.text }}</span>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </div>
+
+  <style>
+    #hero-flex-widget-{{ section.id }} {
+      background: var(--hero-bg);
+    }
+    #hero-flex-widget-{{ section.id }} .hero-inner {
+      padding: var(--hero-pt) var(--hero-px) var(--hero-pb);
+      display: flex;
+      justify-content: center;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-constrain {
+      max-width: var(--hero-maxw);
+      width: 100%;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-card {
+      width: 100%;
+      background: var(--hero-card-bg);
+      border-radius: var(--hero-radius);
+      box-shadow: var(--hero-shadow);
+      padding: clamp(20px, 4vw, 48px);
+    }
+    #hero-flex-widget-{{ section.id }} .hero-title {
+      color: var(--hero-title-color);
+      font-size: clamp(28px, 4vw, var(--hero-title-size));
+      font-weight: var(--hero-title-weight);
+      line-height: 1.1;
+      margin: 0 0 12px;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-body {
+      color: var(--hero-body-color);
+      font-size: clamp(15px, 2.2vw, var(--hero-body-size));
+      font-weight: var(--hero-body-weight);
+      line-height: 1.6;
+      margin: 0 0 22px;
+      opacity: 0.95;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 0 0 18px;
+      justify-content: center;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+      border: 2px solid transparent;
+      transition: transform .06s ease, filter .2s ease, border-color .2s ease;
+      will-change: transform;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-btn:active { transform: translateY(1px); }
+    #hero-flex-widget-{{ section.id }} .hero-btn--fill {
+      background: var(--hero-fill-bg);
+      color: var(--hero-fill-text);
+    }
+    #hero-flex-widget-{{ section.id }} .hero-btn--fill:hover { filter: brightness(0.95); }
+    #hero-flex-widget-{{ section.id }} .hero-btn--outline {
+      background: transparent;
+      color: var(--hero-outline-text);
+      border-color: var(--hero-outline-border);
+    }
+    #hero-flex-widget-{{ section.id }} .hero-btn--outline:hover {
+      background: color-mix(in oklab, var(--hero-outline-border) 12%, transparent);
+    }
+    #hero-flex-widget-{{ section.id }} .hero-list {
+      display: flex;
+      gap: 10px 18px;
+      align-items: start;
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+      justify-content: center;
+    }
+    @media (max-width: 740px) {
+      #hero-flex-widget-{{ section.id }} .hero-list {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+    #hero-flex-widget-{{ section.id }} .hero-list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 24px;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-bullet {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--hero-bullet-color);
+      box-shadow: 0 0 0 6px color-mix(in oklab, var(--hero-bullet-color) 20%, transparent);
+      flex: 0 0 8px;
+    }
+    #hero-flex-widget-{{ section.id }} .hero-list-text {
+      color: var(--hero-body-color);
+      font-size: clamp(14px, 2vw, calc(var(--hero-body-size) - 1px));
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Hero Flex Widget",
+  "class": "section",
+  "settings": [
+    { "type": "select", "id": "bg_type", "label": "Background type", "options": [
+      { "value": "solid", "label": "Solid color" },
+      { "value": "gradient", "label": "Gradient" }
+    ], "default": "solid" },
+
+    { "type": "color", "id": "bg_solid", "label": "Solid background", "default": "#0F172A" },
+
+    { "type": "select", "id": "grad_type", "label": "Gradient type", "options": [
+      { "value": "linear", "label": "Linear" },
+      { "value": "radial", "label": "Radial" },
+      { "value": "conic", "label": "Conic" }
+    ], "default": "linear" },
+    { "type": "range", "id": "grad_angle", "label": "Gradient angle", "min": 0, "max": 100, "step": 1, "default": 38, "unit": "%"},
+    { "type": "color", "id": "grad_start_color", "label": "Start color", "default": "#0EA5E9" },
+    { "type": "range", "id": "grad_start_pos", "label": "Start position (%)", "min": 0, "max": 100, "step": 1, "default": 0 },
+    { "type": "color", "id": "grad_end_color", "label": "End color", "default": "#6366F1" },
+    { "type": "range", "id": "grad_end_pos", "label": "End position (%)", "min": 0, "max": 100, "step": 1, "default": 100 },
+
+    { "type": "color", "id": "card_bg", "label": "Optional inner card background", "default": "#00000000" },
+
+    { "type": "text", "id": "title", "label": "Main title", "default": "Say Goodbye to Back Pain" },
+    { "type": "richtext", "id": "body", "label": "Body text", "default": "<p>Experience ultimate comfort and support with our premium ergonomic back support solution. Designed for all-day relief, whether you're working, driving, or relaxing.</p>" },
+
+    { "type": "color", "id": "title_color", "label": "Title color", "default": "#FFFFFF" },
+    { "type": "color", "id": "body_color", "label": "Body color", "default": "#E5E7EB" },
+    { "type": "range", "id": "title_size", "label": "Title size (px)", "min": 18, "max": 72, "step": 1, "default": 48 },
+    { "type": "select", "id": "title_weight", "label": "Title weight", "options": [
+        { "value": "400", "label": "Normal" },
+        { "value": "600", "label": "Semibold" },
+        { "value": "700", "label": "Bold" },
+        { "value": "800", "label": "Extra Bold" }
+    ], "default": "700" },
+    { "type": "range", "id": "body_size", "label": "Body size (px)", "min": 12, "max": 26, "step": 1, "default": 18 },
+    { "type": "select", "id": "body_weight", "label": "Body weight", "options": [
+      { "value": "300", "label": "Light" },
+      { "value": "400", "label": "Regular" },
+      { "value": "500", "label": "Medium" }
+    ], "default": "400" },
+
+    { "type": "select", "id": "alignment", "label": "Text alignment", "options": [
+      { "value": "left", "label": "Left" },
+      { "value": "center", "label": "Center" }
+    ], "default": "center" },
+
+    { "type": "checkbox", "id": "constrain", "label": "Constrain content width", "default": true },
+    { "type": "range", "id": "max_width", "label": "Max width (px)", "min": 600, "max": 1400, "step": 20, "default": 1000 },
+
+    { "type": "range", "id": "pad_t", "label": "Padding top (px)", "min": 0, "max": 200, "step": 2, "default": 100 },
+    { "type": "range", "id": "pad_b", "label": "Padding bottom (px)", "min": 0, "max": 200, "step": 2, "default": 100 },
+    { "type": "range", "id": "pad_x", "label": "Padding left/right (px)", "min": 0, "max": 80, "step": 2, "default": 24 },
+
+    { "type": "checkbox", "id": "enable_shadow", "label": "Enable card shadow", "default": false },
+    { "type": "range", "id": "radius", "label": "Card corner radius (px)", "min": 0, "max": 40, "step": 1, "default": 16 },
+
+    { "type": "checkbox", "id": "show_buttons", "label": "Show buttons", "default": true },
+
+    { "type": "text", "id": "btn_fill_label", "label": "Filled button label", "default": "Order Your Back Support - $49.99" },
+    { "type": "url", "id": "btn_fill_url", "label": "Filled button link" },
+    { "type": "checkbox", "id": "btn_fill_newtab", "label": "Open filled button in new tab", "default": false },
+    { "type": "color", "id": "btn_fill_bg", "label": "Filled button background", "default": "#FFFFFF" },
+    { "type": "color", "id": "btn_fill_text", "label": "Filled button text", "default": "#0F172A" },
+
+    { "type": "text", "id": "btn_outline_label", "label": "Outline button label", "default": "Learn More" },
+    { "type": "url", "id": "btn_outline_url", "label": "Outline button link" },
+    { "type": "checkbox", "id": "btn_outline_newtab", "label": "Open outline button in new tab", "default": false },
+    { "type": "color", "id": "btn_outline_text", "label": "Outline button text", "default": "#FFFFFF" },
+    { "type": "color", "id": "btn_outline_border", "label": "Outline button border", "default": "#FFFFFF" },
+
+    { "type": "color", "id": "bullet_color", "label": "Default bullet color", "default": "#22C55E" }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "List item",
+      "limit": 3,
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "30-Day Money Back Guarantee" },
+        { "type": "color", "id": "bullet_color", "label": "Bullet color (optional)" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Hero Flex Widget",
+      "blocks": [
+        { "type": "feature", "settings": { "text": "30-Day Money Back Guarantee" } },
+        { "type": "feature", "settings": { "text": "Free Shipping" } },
+        { "type": "feature", "settings": { "text": "1000+ Happy Customers" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

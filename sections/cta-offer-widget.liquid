@@ -1,0 +1,344 @@
+{% comment %}
+  CTA Offer Widget — highly configurable, OS 2.0
+{% endcomment %}
+
+<section
+  id="cta-offer-{{ section.id }}"
+  class="cta-offer"
+  data-width="{{ section.settings.width }}"
+  data-features="{{ section.settings.features_layout }}"
+  style="
+    --ow-bg: {{ section.settings.bg }};
+    --ow-pt: {{ section.settings.padding_top }}px;
+    --ow-pb: {{ section.settings.padding_bottom }}px;
+
+    /* heading */
+    --ow-title-color: {{ section.settings.title_color }};
+    --ow-title-size: {{ section.settings.title_size }}px;
+    --ow-sub-color: {{ section.settings.subtitle_color }};
+    --ow-sub-size: {{ section.settings.subtitle_size }}px;
+
+    /* card */
+    --ow-card-bg: {{ section.settings.card_bg }};
+    --ow-card-border: {{ section.settings.card_border }};
+    --ow-card-radius: {{ section.settings.card_radius }}px;
+    --ow-card-shadow: {% if section.settings.card_shadow %}0 8px 30px rgba(0,0,0,.06){% else %}none{% endif %};
+
+    /* pricing */
+    --ow-old-color: {{ section.settings.old_price_color }};
+    --ow-old-size: {{ section.settings.old_price_size }}px;
+    --ow-new-color: {{ section.settings.new_price_color }};
+    --ow-new-size: {{ section.settings.new_price_size }}px;
+    --ow-badge-bg: {{ section.settings.badge_bg }};
+    --ow-badge-text: {{ section.settings.badge_text_color }};
+    --ow-badge-size: {{ section.settings.badge_size }}px;
+
+    /* CTA */
+    --cta-bg: {{ section.settings.cta_bg }};
+    --cta-text: {{ section.settings.cta_text }};
+    --cta-hover-bg: {{ section.settings.cta_hover_bg }};
+    --cta-hover-text: {{ section.settings.cta_hover_text }};
+    --cta-border-color: {{ section.settings.cta_border_color }};
+    --cta-border-width: {{ section.settings.cta_border_width }}px;
+    --cta-radius: {{ section.settings.cta_radius }}px;
+    --cta-font-size: {{ section.settings.cta_font_size }}px;
+    --cta-py: {{ section.settings.cta_pad_y }}px;
+    --cta-px: {{ section.settings.cta_pad_x }}px;
+
+    /* perks in card */
+    --ow-perk-color: {{ section.settings.perk_color }};
+    --ow-perk-size: {{ section.settings.perk_size }}px;
+
+    /* features (3 below) */
+    --ow-feature-icon-bg: {{ section.settings.feature_icon_bg }};
+    --ow-feature-icon-size: {{ section.settings.feature_icon_size }}px;
+    --ow-feature-title-color: {{ section.settings.feature_title_color }};
+    --ow-feature-title-size: {{ section.settings.feature_title_size }}px;
+    --ow-feature-text-color: {{ section.settings.feature_text_color }};
+    --ow-feature-text-size: {{ section.settings.feature_text_size }}px;
+    --ow-features-gap: {{ section.settings.features_gap }}px;
+    --ow-features-gap-mobile: {{ section.settings.features_gap_mobile }}px;
+
+    /* contact */
+    --ow-contact-color: {{ section.settings.contact_color }};
+    --ow-contact-size: {{ section.settings.contact_size }}px;
+  "
+>
+  <div class="{% if section.settings.width == 'container' %}page-width{% else %}full-width{% endif %}">
+    <div class="ow-inner">
+      <!-- Top heading -->
+      <div class="ow-intro">
+        {% if section.settings.title != blank %}
+          <h2 class="ow-title">{{ section.settings.title }}</h2>
+        {% endif %}
+        {% if section.settings.subtitle != blank %}
+          <p class="ow-subtitle">{{ section.settings.subtitle }}</p>
+        {% endif %}
+      </div>
+
+      <!-- Offer card -->
+      <div class="ow-card">
+        <div class="ow-card-head">
+          {% if section.settings.card_title != blank %}
+            <h3 class="ow-card-title">{{ section.settings.card_title }}</h3>
+          {% endif %}
+          {% if section.settings.card_subtitle != blank %}
+            <p class="ow-card-subtitle">{{ section.settings.card_subtitle }}</p>
+          {% endif %}
+        </div>
+
+        <div class="ow-card-body">
+          <div class="ow-pricing">
+            {% if section.settings.old_price != blank %}
+              <span class="ow-old">{{ section.settings.old_price }}</span>
+            {% endif %}
+            {% if section.settings.new_price != blank %}
+              <span class="ow-new">{{ section.settings.new_price }}</span>
+            {% endif %}
+            {% if section.settings.badge_label != blank %}
+              <span class="ow-badge">{{ section.settings.badge_label }}</span>
+            {% endif %}
+          </div>
+
+          <div class="ow-cta-wrap">
+            {% if section.settings.cta_label != blank and section.settings.cta_url != blank %}
+              <a class="ow-cta {% if section.settings.cta_style == 'outline' %}is-outline{% endif %}"
+                 href="{{ section.settings.cta_url }}"
+                 {% if section.settings.cta_newtab %}target="_blank" rel="noopener"{% endif %}>
+                {{ section.settings.cta_label }}
+              </a>
+            {% endif %}
+            {% if section.blocks.size > 0 %}
+              <ul class="ow-perks">
+                {% for block in section.blocks %}
+                  {% if block.type == 'perk' %}
+                    <li {{ block.shopify_attributes }}>
+                      {{ block.settings.text }}
+                    </li>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Features row (3 items) -->
+      <div class="ow-features">
+        {% for block in section.blocks %}
+          {% if block.type == 'feature' %}
+            <div class="ow-feature" {{ block.shopify_attributes }}>
+              <div class="ow-feature-icon">
+                {% if block.settings.icon_type == 'image' and block.settings.icon_image != blank %}
+                  <img src="{{ block.settings.icon_image | image_url: width: 96 }}" alt="" width="48" height="48" loading="lazy">
+                {% else %}
+                  <span class="ow-emoji" style="font-size: var(--ow-feature-icon-size);">{{ block.settings.icon_emoji }}</span>
+                {% endif %}
+              </div>
+              <div class="ow-feature-text">
+                <div class="ow-feature-title">{{ block.settings.title }}</div>
+                <div class="ow-feature-desc">{{ block.settings.text }}</div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <!-- Contact -->
+      {% if section.settings.contact_line1 != blank or section.settings.contact_line2 != blank %}
+        <div class="ow-contact">
+          {% if section.settings.contact_line1 != blank %}<p>{{ section.settings.contact_line1 }}</p>{% endif %}
+          {% if section.settings.contact_line2 != blank %}<p>{{ section.settings.contact_line2 }}</p>{% endif %}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <style>
+    #cta-offer-{{ section.id }}{background:var(--ow-bg);padding:var(--ow-pt) 1.5rem var(--ow-pb);}
+    #cta-offer-{{ section.id }} .ow-inner{max-width:1200px;margin:0 auto;}
+    #cta-offer-{{ section.id }} .ow-intro{text-align:center;margin-bottom:2rem;}
+    #cta-offer-{{ section.id }} .ow-title{color:var(--ow-title-color);font-size:clamp(28px,5vw,var(--ow-title-size));font-weight:800;margin:0 0 .5rem;}
+    #cta-offer-{{ section.id }} .ow-subtitle{color:var(--ow-sub-color);font-size:clamp(14px,3vw,var(--ow-sub-size));max-width:70ch;margin:0 auto;}
+
+    /* Card */
+    #cta-offer-{{ section.id }} .ow-card{
+      background:var(--ow-card-bg); border:2px solid var(--ow-card-border);
+      border-radius:var(--ow-card-radius); box-shadow:var(--ow-card-shadow);
+      padding:1.25rem 1.25rem 1.5rem; margin:2rem auto; max-width:940px;
+    }
+    #cta-offer-{{ section.id }} .ow-card-head{text-align:center;margin-bottom:.75rem;}
+    #cta-offer-{{ section.id }} .ow-card-title{font-weight:700;color:var(--ow-new-color);font-size:clamp(20px,3.5vw,28px);margin:0;}
+    #cta-offer-{{ section.id }} .ow-card-subtitle{color:var(--ow-sub-color);font-size:clamp(14px,3vw,18px);margin:.25rem 0 0;}
+
+    #cta-offer-{{ section.id }} .ow-card-body{padding-top:.5rem;}
+    #cta-offer-{{ section.id }} .ow-pricing{display:flex;align-items:center;justify-content:center;gap:1rem;margin:1rem 0;}
+    #cta-offer-{{ section.id }} .ow-old{color:var(--ow-old-color);font-size:var(--ow-old-size);text-decoration:line-through;}
+    #cta-offer-{{ section.id }} .ow-new{color:var(--ow-new-color);font-weight:800;font-size:var(--ow-new-size);}
+    #cta-offer-{{ section.id }} .ow-badge{background:var(--ow-badge-bg);color:var(--ow-badge-text);padding:.25rem .6rem;border-radius:999px;font-weight:700;font-size:var(--ow-badge-size);}
+
+    /* CTA */
+    #cta-offer-{{ section.id }} .ow-cta{display:inline-flex;align-items:center;justify-content:center;
+      padding:var(--cta-py) var(--cta-px);font-size:var(--cta-font-size);font-weight:700;text-decoration:none;border-radius:var(--cta-radius);
+      background:var(--cta-bg);color:var(--cta-text);border:var(--cta-border-width) solid var(--cta-border-color);
+      transition:background .2s ease,color .2s ease,filter .2s ease;}
+    #cta-offer-{{ section.id }} .ow-cta.is-outline{background:transparent;color:var(--cta-border-color);}
+    #cta-offer-{{ section.id }} .ow-cta:hover{background:var(--cta-hover-bg);color:var(--cta-hover-text);filter:brightness(.98);}
+    #cta-offer-{{ section.id }} .ow-cta-wrap{text-align:center;margin:0 auto;}
+    #cta-offer-{{ section.id }} .ow-perks{margin:1.5rem auto 0;max-width:560px;color:var(--ow-perk-color);font-size:var(--ow-perk-size);list-style:none;padding:0;text-align:left;display: flex;flex-direction: column;align-items: center;}
+    #cta-offer-{{ section.id }} .ow-perks li{margin:0;}
+    #cta-offer-{{ section.id }} .ow-perks li::before{content:'✓ ';font-weight:700;margin-right:.25rem;}
+
+    /* Features */
+    #cta-offer-{{ section.id }} .ow-features{display:grid;grid-template-columns:1fr;gap:1rem;margin:2rem 0;}
+    @media(min-width:768px){#cta-offer-{{ section.id }} .ow-features{grid-template-columns:repeat(3,1fr);gap:1.25rem;}}
+    #cta-offer-{{ section.id }} .ow-feature{display:flex;align-items:center;gap:.75rem;}
+    #cta-offer-{{ section.id }} .ow-feature-icon{width:5rem;height:5rem;border-radius:999px;background:var(--ow-feature-icon-bg);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+    #cta-offer-{{ section.id }} .ow-feature-icon img{width:60%;height:60%;object-fit:contain;}
+    #cta-offer-{{ section.id }} .ow-emoji{line-height:1;}
+    #cta-offer-{{ section.id }} .ow-feature-title{color:var(--ow-feature-title-color);font-weight:700;font-size:var(--ow-feature-title-size);line-height: 1.4em;}
+    #cta-offer-{{ section.id }} .ow-feature-desc{color:var(--ow-feature-text-color);font-size:var(--ow-feature-text-size);line-height: 1.4em;}
+
+    /* Flex-centered variant for features */
+    #cta-offer-{{ section.id }}[data-features="flex"] .ow-features{display: flex;justify-content: center;gap: var(--ow-features-gap);flex-wrap: wrap;}
+    #cta-offer-{{ section.id }}[data-features="flex"] .ow-feature{flex: 0 0 auto;}
+    /* Features – grid baseline uses variables */
+    #cta-offer-{{ section.id }} .ow-features{display:grid;margin:4rem 0;}
+
+    /* 1 column on mobile for flex layout */
+    @media (max-width: 767px){
+    #cta-offer-{{ section.id }}[data-features="flex"] .ow-features{ gap: var(--ow-features-gap-mobile); }
+    #cta-offer-{{ section.id }}[data-features="flex"] .ow-feature{ flex: 0 0 100%; }
+    }
+
+    @media(min-width:768px){
+    #cta-offer-{{ section.id }} .ow-features{grid-template-columns:repeat(3,1fr);gap: var(--ow-features-gap);/* was 1.25rem */}}
+
+
+    /* Contact */
+    #cta-offer-{{ section.id }} .ow-contact{color:var(--ow-contact-color);font-size:var(--ow-contact-size);text-align:center;margin-top:1.5rem;}
+    .ow-contact p {margin-bottom:0;} .ow-contact p:last-child{margin-top:0;}
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "CTA offer widget",
+  "settings": [
+    { "type": "select", "id": "width", "label": "Section width", "options": [
+      { "value": "container", "label": "Container (.page-width)" },
+      { "value": "full", "label": "Full width" }
+    ], "default": "container" },
+
+    { "type": "color", "id": "bg", "label": "Section background", "default": "#ffffff" },
+
+    { "type": "text", "id": "title", "label": "Main title", "default": "Ready to End Your Back Pain?" },
+    { "type": "text", "id": "subtitle", "label": "Subtitle", "default": "Don't let back pain control your life. Take action today and experience the comfort and support you deserve." },
+    { "type": "color", "id": "title_color", "label": "Title color", "default": "#0f172a" },
+    { "type": "range", "id": "title_size", "label": "Title size (px)", "min": 22, "max": 72, "step": 1, "default": 44 },
+    { "type": "color", "id": "subtitle_color", "label": "Subtitle color", "default": "#334155" },
+    { "type": "range", "id": "subtitle_size", "label": "Subtitle size (px)", "min": 12, "max": 26, "step": 1, "default": 18 },
+
+    { "type": "color", "id": "card_bg", "label": "Limited-time box background", "default": "#f8fafc" },
+    { "type": "color", "id": "card_border", "label": "Limited-time box border color", "default": "#cbd5e1" },
+    { "type": "range", "id": "card_radius", "label": "Limited-time box corner radius (px)", "min": 0, "max": 40, "step": 1, "default": 16 },
+    { "type": "checkbox", "id": "card_shadow", "label": "Limited-time box shadow", "default": false },
+
+    { "type": "text", "id": "card_title", "label": "Offer box title", "default": "Limited Time Offer" },
+    { "type": "text", "id": "card_subtitle", "label": "Offer box subtitle", "default": "Save $20 on your order today!" },
+
+    { "type": "text", "id": "old_price", "label": "Was price", "default": "$69.99" },
+    { "type": "text", "id": "new_price", "label": "Now price", "default": "$49.99" },
+    { "type": "color", "id": "old_price_color", "label": "Was price color", "default": "#94a3b8" },
+    { "type": "range", "id": "old_price_size", "label": "Was price size (px)", "min": 12, "max": 34, "step": 1, "default": 22 },
+    { "type": "color", "id": "new_price_color", "label": "Now price color", "default": "#0f172a" },
+    { "type": "range", "id": "new_price_size", "label": "Now price size (px)", "min": 18, "max": 60, "step": 1, "default": 36 },
+    { "type": "text", "id": "badge_label", "label": "Badge text", "default": "Save $20" },
+    { "type": "color", "id": "badge_bg", "label": "Badge background", "default": "#ef4444" },
+    { "type": "color", "id": "badge_text_color", "label": "Badge text color", "default": "#ffffff" },
+    { "type": "range", "id": "badge_size", "label": "Badge font size (px)", "min": 10, "max": 22, "step": 1, "default": 14 },
+
+    { "type": "text", "id": "cta_label", "label": "CTA label", "default": "Order Now - $49.99" },
+    { "type": "url", "id": "cta_url", "label": "CTA link" },
+    { "type": "checkbox", "id": "cta_newtab", "label": "Open CTA in new tab", "default": false },
+    { "type": "select", "id": "cta_style", "label": "CTA style", "options": [
+      { "value": "filled", "label": "Filled" },
+      { "value": "outline", "label": "Outline" }
+    ], "default": "filled" },
+    { "type": "color", "id": "cta_bg", "label": "CTA background", "default": "#111827" },
+    { "type": "color", "id": "cta_text", "label": "CTA text color", "default": "#ffffff" },
+    { "type": "color", "id": "cta_hover_bg", "label": "CTA hover background", "default": "#0a0a0a" },
+    { "type": "color", "id": "cta_hover_text", "label": "CTA hover text color", "default": "#ffffff" },
+    { "type": "color", "id": "cta_border_color", "label": "CTA border color", "default": "#111827" },
+    { "type": "range", "id": "cta_border_width", "label": "CTA border width (px)", "min": 0, "max": 8, "step": 1, "default": 2 },
+    { "type": "range", "id": "cta_radius", "label": "CTA corner radius (0–100 → 0–40px)", "min": 0, "max": 100, "step": 1, "default": 100, "unit": "%" },
+    { "type": "range", "id": "cta_font_size", "label": "CTA font size (px)", "min": 12, "max": 26, "step": 1, "default": 18 },
+    { "type": "range", "id": "cta_pad_y", "label": "CTA padding Y (px)", "min": 6, "max": 24, "step": 1, "default": 12 },
+    { "type": "range", "id": "cta_pad_x", "label": "CTA padding X (px)", "min": 12, "max": 36, "step": 1, "default": 24 },
+
+    { "type": "color", "id": "perk_color", "label": "Perks text color", "default": "#475569" },
+    { "type": "range", "id": "perk_size", "label": "Perks text size (px)", "min": 10, "max": 20, "step": 1, "default": 14 },
+
+    { "type": "color", "id": "feature_icon_bg", "label": "Feature icon circle background", "default": "#e5e7eb" },
+    { "type": "range", "id": "feature_icon_size", "label": "Feature icon size (px)", "min": 16, "max": 48, "step": 1, "default": 28 },
+    { "type": "color", "id": "feature_title_color", "label": "Feature title color", "default": "#0f172a" },
+    { "type": "range", "id": "feature_title_size", "label": "Feature title size (px)", "min": 12, "max": 26, "step": 1, "default": 16 },
+    { "type": "color", "id": "feature_text_color", "label": "Feature text color", "default": "#475569" },
+    { "type": "range", "id": "feature_text_size", "label": "Feature text size (px)", "min": 10, "max": 20, "step": 1, "default": 13 },
+
+    { "type": "text", "id": "contact_line1", "label": "Contact line 1", "default": "Questions? Contact us at support@comfyback.com" },
+    { "type": "text", "id": "contact_line2", "label": "Contact line 2", "default": "Or call us at 1-800-COMFORT (1-800-266-3678)" },
+    { "type": "color", "id": "contact_color", "label": "Contact color", "default": "#475569" },
+    { "type": "range", "id": "contact_size", "label": "Contact size (px)", "min": 10, "max": 22, "step": 1, "default": 14 },
+
+    { "type": "select", "id": "features_layout", "label": "Features layout", "options": [
+    { "value": "grid", "label": "Grid (default)" },
+    { "value": "flex", "label": "Flex centered" }
+    ], "default": "grid" },
+
+    { "type": "range", "id": "features_gap", "label": "Features gap desktop (0–100 → 0–200px)", "min": 0, "max": 100, "step": 1, "default": 78, "unit": "%"},
+    { "type": "range", "id": "features_gap_mobile", "label": "Features gap mobile (0–100 → 0–200px)", "min": 0, "max": 100, "step": 1, "default": 10, "unit": "%"},
+
+    { "type": "range", "id": "padding_top", "label": "Section padding top (px)", "min": 0, "max": 200, "step": 4, "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Section padding bottom (px)", "min": 0, "max": 200, "step": 4, "default": 80 }
+  ],
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "Perk (under button)",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Perk text", "default": "Free shipping to your door" }
+      ]
+    },
+    {
+      "type": "feature",
+      "name": "Feature item",
+      "limit": 3,
+      "settings": [
+        { "type": "select", "id": "icon_type", "label": "Icon type", "options": [
+          { "value": "emoji", "label": "Emoji" },
+          { "value": "image", "label": "Image" }
+        ], "default": "emoji" },
+        { "type": "text", "id": "icon_emoji", "label": "Emoji (if selected)", "default": "🚚" },
+        { "type": "image_picker", "id": "icon_image", "label": "Image (if selected)" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Free Shipping" },
+        { "type": "text", "id": "text", "label": "Description", "default": "Delivered to your door" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "CTA offer widget",
+      "blocks": [
+        { "type": "perk", "settings": { "text": "Free shipping to your door" } },
+        { "type": "perk", "settings": { "text": "30-day money-back guarantee" } },
+        { "type": "perk", "settings": { "text": "Secure payment processing" } },
+
+        { "type": "feature", "settings": { "icon_emoji": "🚚", "title": "Free Shipping", "text": "Delivered to your door" } },
+        { "type": "feature", "settings": { "icon_emoji": "💰", "title": "Money Back", "text": "30-day guarantee" } },
+        { "type": "feature", "settings": { "icon_emoji": "🛡️", "title": "Secure Payment", "text": "Safe & encrypted" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
