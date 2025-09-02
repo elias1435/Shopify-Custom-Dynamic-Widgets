@@ -1,0 +1,24 @@
+/* for search */
+
+.section-header, .header-wrapper, .header { overflow: visible; position: relative; }
+.header__search-inline .predictive-search{
+  z-index: 60; background:#fff; border:1px solid #e5e7eb; border-radius:8px;
+  box-shadow:0 12px 30px rgba(0,0,0,.06);
+}
+/* simple CSS spinner (replace missing icon-spinner.svg) */
+.inline-spinner{ width:20px;height:20px;border:2px solid #e5e7eb;border-top-color:#111;border-radius:50%;
+  display:inline-block; animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Always allow predictive panel to be shown inline */
+.header__search-inline .predictive-search { display:block !important; }
+.header__search-inline .predictive-search[hidden] { display:none !important; }
+
+/* Empty state style */
+.predictive-search__empty {
+  padding: 12px 14px;
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* end search */
