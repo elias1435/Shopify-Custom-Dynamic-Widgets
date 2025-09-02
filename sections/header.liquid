@@ -1,0 +1,39 @@
+
+<!-- live searh form -->
+<div class="header__search-inline small-hide medium-hide"
+     style="flex:1 1 520px;max-width:720px;margin:0 16px;display:flex;align-items:center;position:relative;z-index:30;">
+  <predictive-search class="header-search-inline" data-loading-text="{{ 'general.search.loading' | t }}">
+    <form action="{{ routes.search_url }}" method="get" role="search"
+          class="search" style="display:flex;align-items:center;gap:8px;width:100%;">
+      <input
+        type="search"
+        name="q"
+        value="{{ search.terms | escape }}"
+        placeholder="{{ 'general.search.search' | t }}"
+        class="search__input field__input"
+        data-predictive-search-input
+        enterkeyhint="search"
+        autocapitalize="off"
+        autocomplete="off"
+        aria-label="{{ 'general.search.search' | t }}"
+        style="flex:1 1 auto;min-width:260px;height:40px;padding:0 12px;border:1px solid #e5e7eb;border-radius:999px;">
+      <button class="search__button field__button" aria-label="{{ 'general.search.search' | t }}"
+              style="display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:999px;border:1px solid #e5e7eb;background:#fff;">
+        <span class="svg-wrapper">{{ 'icon-search.svg' | inline_asset_content }}</span>
+      </button>
+      <input type="hidden" name="type" value="product">
+    </form>
+<div class="predictive-search" tabindex="-1" data-predictive-search hidden
+     style="position:absolute;top:48px;left:0;right:0;">
+  <div class="predictive-search__loading-state" hidden>
+    <span class="inline-spinner" aria-hidden="true"></span>
+  </div>
+  <div class="predictive-search__results" data-predictive-search-results></div>
+
+  <!-- NEW: empty state -->
+  <div class="predictive-search__empty" data-predictive-search-empty hidden>
+    No Result found
+  </div>
+</div>
+</predictive-search>
+</div>
