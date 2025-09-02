@@ -1,0 +1,96 @@
+<html>
+<body>
+
+
+
+<script>
+// this script for live search
+(function(){
+  const host = document.querySelector('.header__search-inline predictive-search');
+  if (!host) return;
+
+  const input   = host.querySelector('[data-predictive-search-input]');
+  const panel   = host.querySelector('[data-predictive-search]');
+  const results = host.querySelector('[data-predictive-search-results]');
+  if (!input || !panel || !results) return;
+
+  // Ensure an empty-state node exists (adds one if missing)
+  const empty = host.querySelector('[data-predictive-search-empty]') || (() => {
+    const el = document.createElement('div');
+    el.className = 'predictive-search__empty';
+    el.setAttribute('data-predictive-search-empty', '');
+    el.hidden = true;
+    el.textContent = 'No Result found';
+    results.insertAdjacentElement('afterend', el);
+    return el;
+  })();
+
+  // If Dawn's native predictive-search is present, bail (your native already works)
+  if (window.customElements && window.customElements.get('predictive-search')) return;
+
+  let ctl;
+  input.addEventListener('input', async (e) => {
+    const q = e.target.value.trim();
+
+    if (q.length < 3) {
+      if (ctl) ctl.abort();
+      results.innerHTML = '';
+      empty.hidden = true;
+      panel.hidden = true;
+      return;
+    }
+
+    if (ctl) ctl.abort();
+    ctl = new AbortController();
+
+    const url = `/search/suggest.json?q=${encodeURIComponent(q)}&resources[type]=product,collection,page,article&resources[limit]=4&section_id=predictive-search`;
+
+    try {
+      const res = await fetch(url, { signal: ctl.signal, headers: { 'Accept': 'application/json' } });
+      if (!res.ok) return;
+      const data = await res.json();
+
+      // Server-rendered HTML path
+      const html = data?.resources?.results_html || '';
+      if (html && html.trim()) {
+        results.innerHTML = html;
+        empty.hidden = true;
+        panel.hidden = false;
+        return;
+      }
+
+      // JSON fallback path
+      const prods = data?.resources?.results?.products || [];
+      if (prods.length) {
+        results.innerHTML = `<ul class="ps-list" style="list-style:none;margin:0;padding:8px;">
+          ${prods.map(p => `
+            <li style="display:flex;gap:10px;align-items:center;padding:6px 8px;">
+              ${p.image ? `<img src="${p.image}" alt="" width="40" height="40" style="object-fit:cover;border-radius:6px;">` : ``}
+              <a href="${p.url}" style="text-decoration:none;color:inherit;flex:1 1 auto;">
+                <div style="font-weight:600;">${p.title}</div>
+                ${p.price ? `<div style="font-size:12px;opacity:.7;">${p.price}</div>` : ``}
+              </a>
+            </li>`).join('')}
+        </ul>`;
+        empty.hidden = true;
+        panel.hidden = false;
+      } else {
+        results.innerHTML = '';
+        empty.hidden = false;   // <- show "No Result found"
+        panel.hidden = false;   // <- keep dropdown open
+      }
+    } catch (_) {}
+  });
+
+  // Close everything on outside click
+  document.addEventListener('click', (ev) => {
+    if (!host.contains(ev.target)) {
+      panel.hidden = true;
+      empty.hidden = true;
+    }
+  });
+})();
+</script>
+
+</body>
+</thml>
