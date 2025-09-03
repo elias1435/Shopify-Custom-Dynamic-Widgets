@@ -85,3 +85,285 @@
     }
   </style>
 {%- endif -%}
+
+
+
+{% comment %} User artwork upload option {% endcomment %}
+<fieldset class="artwork-upload" style="margin:1rem 0 1.5rem;">
+  <legend class="artwork-upload__legend">Upload artwork</legend>
+
+  <div id="artworkInputs" class="artwork-upload__grid">
+    <label class="artwork-upload__card">
+      <span class="artwork-upload__label">File 1</span>
+      <input
+        type="file"
+        name="properties[Artwork 1]"
+        class="artwork-upload__input"
+        accept=".jpg,.jpeg,.png,.webp,.pdf,.svg,.ai,.eps,image/webp"
+      >
+      <small class="artwork-upload__hint">
+        JPG, PNG, PDF, WEBP, SVG, AI, EPS. Max ~20MB each.
+      </small>
+      <div class="artwork-upload__preview" aria-live="polite"></div>
+    </label>
+  </div>
+
+  <button type="button" id="addMoreArtwork" class="artwork-upload__add-btn">
+    + Add another file
+  </button>
+
+  <div class="artwork-upload__errors" aria-live="polite"></div>
+</fieldset>
+
+<style>
+  .artwork-upload__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+  @media (max-width: 520px) {
+    .artwork-upload__grid { grid-template-columns: 1fr; }
+  }
+  .artwork-upload__card {
+    border: 1px solid rgba(0,0,0,.12);
+    border-radius: 10px;
+    padding: .75rem;
+    background: #fff;
+  }
+  .artwork-upload__label { font-weight: 600; display:block; margin-bottom:.5rem; }
+  .artwork-upload__input {
+    display:block; width:100%;
+  }
+  .artwork-upload__hint {
+    display:block; margin-top:.35rem; opacity:.8;
+  }
+  .artwork-upload__preview {
+    margin-top:.5rem; font-size:.9rem; line-height:1.2rem;
+  }
+  .artwork-upload__preview img {
+    max-width:100%; height:auto; display:block; margin-top:.35rem; border-radius:8px;
+  }
+  .artwork-upload__add-btn {
+    margin-top:.75rem;
+    border:1px solid rgba(0,0,0,.18);
+    background:#fff;
+    border-radius:8px;
+    padding:.5rem .75rem;
+    cursor:pointer;
+  }
+  .artwork-upload__errors {
+    color:#c33; margin-top:.5rem;
+  }
+</style>
+
+
+<script>
+(function() {
+  // ===== Config =====
+  var MAX_FILES = 2;
+  var MAX_BYTES = 20 * 1024 * 1024; // ~20MB each
+  var allowedExt = ['jpg','jpeg','png','webp','pdf','svg','ai','eps'];
+  var allowedMime = [
+    'image/jpeg','image/png','image/webp','application/pdf','image/svg+xml',
+    // EPS/AI are inconsistent; some browsers omit type, so we rely on extension for them.
+  ];
+
+  // ===== Elements =====
+  var grid   = document.getElementById('artworkInputs');
+  var addBtn = document.getElementById('addMoreArtwork');
+  var errors = document.querySelector('.artwork-upload__errors');
+
+  // ===== Helpers =====
+  function extOf(fileName) {
+    var m = /\.([a-z0-9]+)$/i.exec(fileName || '');
+    return m ? m[1].toLowerCase() : '';
+  }
+
+  function isAllowed(file) {
+    var ext = extOf(file.name);
+    var type = (file.type || '').toLowerCase();
+    var byExt = allowedExt.indexOf(ext) !== -1;
+    var byMime = !type || allowedMime.indexOf(type) !== -1; // some files have empty type
+    // Require ext to be allowed, and if MIME exists, require that too.
+    return byExt && byMime;
+  }
+
+  function isPreviewableImage(file) {
+    var ext = extOf(file.name);
+    if (['jpg','jpeg','png','svg','webp'].indexOf(ext) !== -1) return true;
+    if (file.type && file.type.indexOf('image/') === 0) return true;
+    return false;
+  }
+
+  function validateAndPreview(inputEl, previewEl) {
+    errors.textContent = '';
+    previewEl.innerHTML = '';
+    var f = inputEl.files && inputEl.files[0];
+    if (!f) return;
+
+    if (!isAllowed(f)) {
+      var ext = extOf(f.name) || 'unknown';
+      errors.textContent = 'Unsupported file: ' + f.name + ' (' + (f.type || ext) + '). ' +
+        'Allowed: ' + allowedExt.join(', ').toUpperCase();
+      inputEl.value = '';
+      return;
+    }
+    if (f.size > MAX_BYTES) {
+      errors.textContent = 'File "' + f.name + '" exceeds the size limit (~20MB).';
+      inputEl.value = '';
+      return;
+    }
+
+    // Show name + size
+    var nameP = document.createElement('div');
+    nameP.textContent = f.name + ' (' + Math.round(f.size/1024) + ' KB)';
+    previewEl.appendChild(nameP);
+
+    // Image preview (incl. WEBP)
+    if (isPreviewableImage(f)) {
+      var img = document.createElement('img');
+      img.alt = f.name;
+      img.loading = 'lazy';
+      img.draggable = false;
+      var reader = new FileReader();
+      reader.onload = function(e){ img.src = e.target.result; };
+      reader.readAsDataURL(f);
+      previewEl.appendChild(img);
+    }
+  }
+
+  function addField() {
+    var count = grid.querySelectorAll('.artwork-upload__card').length;
+    if (count >= MAX_FILES) return;
+
+    var label = document.createElement('label');
+    label.className = 'artwork-upload__card';
+
+    var span = document.createElement('span');
+    span.className = 'artwork-upload__label';
+    span.textContent = 'File ' + (count + 1);
+
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.name = 'properties[Artwork ' + (count + 1) + ']';
+    input.className = 'artwork-upload__input';
+    input.setAttribute('accept', '.jpg,.jpeg,.png,.webp,.pdf,.svg,.ai,.eps,image/webp');
+
+    var hint = document.createElement('small');
+    hint.className = 'artwork-upload__hint';
+    hint.textContent = 'JPG, PNG, WEBP, PDF, SVG, AI, EPS. Max ~20MB each.';
+
+    var preview = document.createElement('div');
+    preview.className = 'artwork-upload__preview';
+    preview.setAttribute('aria-live', 'polite');
+
+    input.addEventListener('change', function(){ validateAndPreview(input, preview); });
+
+    label.appendChild(span);
+    label.appendChild(input);
+    label.appendChild(hint);
+    label.appendChild(preview);
+    grid.appendChild(label);
+
+    input.focus();
+  }
+
+  // Wire first field
+  var firstInput = grid.querySelector('.artwork-upload__input');
+  var firstPreview = grid.querySelector('.artwork-upload__preview');
+  if (firstInput) {
+    firstInput.addEventListener('change', function(){ validateAndPreview(firstInput, firstPreview); });
+  }
+
+  if (addBtn) {
+    addBtn.addEventListener('click', function(){
+      addField();
+      if (grid.querySelectorAll('.artwork-upload__card').length >= MAX_FILES) {
+        addBtn.disabled = true;
+        addBtn.textContent = 'Maximum files reached';
+      }
+    });
+  }
+
+  // ===== Optional: WEBP → PNG fallback if your theme/Shopify rejects WEBP at upload =====
+  // Set to true to enable. This intercepts the product form submit and posts FormData manually.
+  var ENABLE_WEBP_FALLBACK = false;
+
+  if (ENABLE_WEBP_FALLBACK) {
+    document.addEventListener('submit', function(e) {
+      var form = e.target;
+      if (!form.matches('form[action*="/cart/add"]')) return;
+
+      e.preventDefault(); // we will handle the submission
+
+      var fd = new FormData(form);
+
+      // Convert any .webp images to PNG before sending
+      var conversions = [];
+      fd.forEach(function(value, key) {
+        if (value instanceof File) {
+          var name = value.name || '';
+          var ext = extOf(name);
+          var type = (value.type || '').toLowerCase();
+          var isWebp = ext === 'webp' || type === 'image/webp';
+          if (isWebp) {
+            conversions.push(new Promise(function(resolve) {
+              var img = new Image();
+              img.onload = function(){
+                try {
+                  var canvas = document.createElement('canvas');
+                  canvas.width = img.naturalWidth;
+                  canvas.height = img.naturalHeight;
+                  var ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0);
+                  canvas.toBlob(function(pngBlob){
+                    var fileName = name.replace(/\.webp$/i, '.png');
+                    resolve({ key: key, file: new File([pngBlob], fileName, { type: 'image/png' }) });
+                  }, 'image/png');
+                } catch (err) {
+                  // If canvas fails (e.g., cross-origin), fall back to original file
+                  resolve({ key: key, file: value });
+                }
+              };
+              img.onerror = function(){ resolve({ key: key, file: value }); };
+              img.src = URL.createObjectURL(value);
+            }));
+          }
+        }
+      });
+
+      Promise.all(conversions).then(function(results){
+        // Replace entries with converted PNGs
+        results.forEach(function(r){
+          if (!r) return;
+          // Remove all with that key, then re-append
+          var allValues = fd.getAll(r.key);
+          // Clear existing
+          fd.delete(r.key);
+          // Re-add, substituting the converted file where the original WEBP was
+          var replaced = false;
+          allValues.forEach(function(v){
+            if (!replaced && v instanceof File && (/\.webp$/i).test(v.name)) {
+              fd.append(r.key, r.file);
+              replaced = true;
+            } else {
+              fd.append(r.key, v);
+            }
+          });
+        });
+
+        // Post to Shopify
+        fetch('/cart/add.js', { method: 'POST', body: fd, credentials: 'same-origin' })
+          .then(function(res){ return res.json(); })
+          .then(function(data){
+            // TODO: hook into your theme’s cart UI (drawer, mini-cart, etc.)
+            window.location.href = '/cart';
+          })
+          .catch(function(err){
+            errors.textContent = 'Upload failed. Please try again.';
+          });
+      });
+    });
+  }
+})();
+</script>
