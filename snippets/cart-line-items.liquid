@@ -1,0 +1,11 @@
+{% comment %} display metaobject to cart page {% endcomment %}
+
+{% if item.properties != blank %}
+  <ul class="cart-item__properties">
+    {% for p in item.properties %}
+      {% if p.last != blank and p.first != '_instructions' %}
+        <li>{{ p.first }}: {{ p.last }}</li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endif %}
