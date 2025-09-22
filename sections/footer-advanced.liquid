@@ -1,0 +1,263 @@
+{% comment %}
+  Footer Advanced — 2-row layout
+  Row 1 (6 columns): Newsletter | Menu 1 | Menu 2 | Menu 3 | Scroll-to-top
+  Row 2: Copyright line
+{% endcomment %}
+
+<section
+  id="footer-advanced-{{ section.id }}"
+  class="footer-advanced"
+  style="
+    --fa-bg: {{ section.settings.bg_color }};
+    --fa-text: {{ section.settings.text_color }};
+    --fa-link: {{ section.settings.link_color }};
+    --fa-link-hover: {{ section.settings.link_hover_color }};
+    --fa-heading: {{ section.settings.heading_color }};
+
+    --fa-base-size: {{ section.settings.base_font_size }}px;
+    --fa-heading-size: {{ section.settings.heading_font_size }}px;
+
+    --fa-pt: {{ section.settings.padding_top }}px;
+    --fa-pb: {{ section.settings.padding_bottom }}px;
+
+    --fa-copy-color: {{ section.settings.copyright_color }};
+    --fa-copy-size: {{ section.settings.copyright_size }}px;
+
+    --fa-col-gap: {{ section.settings.col_gap }}px;
+    --fa-row-gap: {{ section.settings.row_gap }}px;
+
+    --fa-input-bg: {{ section.settings.input_bg }};
+    --fa-input-text: {{ section.settings.input_text }};
+    --fa-input-border: {{ section.settings.input_border }};
+    --fa-btn-bg: {{ section.settings.btn_bg }};
+    --fa-btn-text: {{ section.settings.btn_text }};
+    --fa-btn-border: {{ section.settings.btn_border }};
+    --fa-btn-radius: {{ section.settings.btn_radius }}px;
+  "
+>
+  <div class="{% if section.settings.full_width %}fa-wrap-full{% else %}fa-wrap{% endif %}">
+    <!-- ROW 1 -->
+    <div class="fa-row fa-row--top">
+      <!-- Col 1: Newsletter -->
+      <div class="fa-col fa-col--newsletter">
+        {% if section.settings.news_heading != blank %}
+          <h3 class="fa-heading">{{ section.settings.news_heading }}</h3>
+        {% endif %}
+
+        {% if section.settings.news_subheading != blank %}
+          <p class="fa-sub">{{ section.settings.news_subheading }}</p>
+        {% endif %}
+
+        <form method="post" action="{{ routes.root_url }}contact#FooterNewsletter-{{ section.id }}" accept-charset="UTF-8" id="FooterNewsletter-{{ section.id }}" class="fa-newsform">
+          <input type="hidden" name="form_type" value="customer">
+          <input type="hidden" name="utf8" value="✓">
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <label class="visually-hidden" for="FooterNewsletterEmail-{{ section.id }}">{{ 'general.newsletter_form.email_placeholder' | t | default: 'Email address' }}</label>
+          <div class="fa-newsform__row">
+            <input
+              id="FooterNewsletterEmail-{{ section.id }}"
+              type="email"
+              name="contact[email]"
+              placeholder="{{ section.settings.news_placeholder | default: 'Enter email address' }}"
+              required
+              autocapitalize="off"
+              autocomplete="email"
+              autocorrect="off"
+            >
+            <button type="submit">{{ section.settings.news_button_label | default: 'Subscribe' }}</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Col 2: Menu A -->
+      <div class="fa-col">
+        {% if section.settings.menu_a_heading != blank %}
+          <h3 class="fa-heading">{{ section.settings.menu_a_heading }}</h3>
+        {% endif %}
+        {% if section.settings.menu_a != blank and linklists[section.settings.menu_a] %}
+          <ul class="fa-menu" role="list">
+            {% for link in linklists[section.settings.menu_a].links %}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <!-- Col 3: Menu B -->
+      <div class="fa-col">
+        {% if section.settings.menu_b_heading != blank %}
+          <h3 class="fa-heading">{{ section.settings.menu_b_heading }}</h3>
+        {% endif %}
+        {% if section.settings.menu_b != blank and linklists[section.settings.menu_b] %}
+          <ul class="fa-menu" role="list">
+            {% for link in linklists[section.settings.menu_b].links %}
+              <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <!-- Col 4: Menu C -->
+      <div class="fa-col">
+        {% if section.settings.menu_c_heading != blank %}
+          <h3 class="fa-heading">{{ section.settings.menu_c_heading }}</h3>
+        {% endif %}
+        {% if section.settings.menu_c != blank and linklists[section.settings.menu_c] %}
+          <ul class="fa-menu" role="list">
+            {% for link in linklists[section.settings.menu_c].links %}
+              <li><a href="{{ link.url }}" target="_blank">{{ link.title }}</a></li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+
+      <!-- Col 5: Scroll-to-top -->
+      <div class="fa-col fa-col--to-top">
+        <button type="button" class="fa-topbtn" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+          <svg viewBox="0 0 24 24" aria-hidden="true" width="24" height="24">
+            <path d="M12 5l7 7-1.4 1.4L13 9.8V20h-2V9.8L6.4 13.4 5 12z" fill="currentColor"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ROW 2 -->
+    <div class="fa-row fa-row--bottom">
+      <p class="fa-copy">
+        {{ section.settings.copyright_prefix }}
+        {{ 'now' | date: '%Y' }} {{ section.settings.copyright_name }}
+        {{ section.settings.copyright_suffix }}
+      </p>
+    </div>
+  </div>
+
+  <style>
+    #footer-advanced-{{ section.id }}{
+      background:var(--fa-bg);
+      color:var(--fa-text);
+      padding:var(--fa-pt) 0 var(--fa-pb);
+      font-size:var(--fa-base-size);
+    }
+    #footer-advanced-{{ section.id }} .fa-wrap{max-width:1200px;margin:0 auto;padding:0 20px;}
+    #footer-advanced-{{ section.id }} .fa-wrap-full{max-width:none;padding:0 20px;}
+    #footer-advanced-{{ section.id }} a{color:var(--fa-link);text-decoration:none}
+    #footer-advanced-{{ section.id }} a:hover{color:var(--fa-link-hover);text-decoration:underline}
+
+    /* rows & columns */
+    #footer-advanced-{{ section.id }} .fa-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));column-gap:var(--fa-col-gap);row-gap:var(--fa-row-gap);}
+    #footer-advanced-{{ section.id }} .fa-row--top{align-items:start;margin-bottom:24px;}
+    #footer-advanced-{{ section.id }} .fa-col{min-width:0}
+    #footer-advanced-{{ section.id }} .fa-col--newsletter{grid-column:span 2;}
+
+    /* headings */
+    #footer-advanced-{{ section.id }} .fa-heading{
+      color:var(--fa-heading);
+      font-size:var(--fa-heading-size);
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      margin:0 0 .75rem;
+    }
+    #footer-advanced-{{ section.id }} .fa-sub{margin:.25rem 0 1.25rem;opacity:.9}
+
+    /* newsletter form */
+    #footer-advanced-{{ section.id }} .fa-newsform__row{display:flex;gap:10px;align-items:center}
+    #footer-advanced-{{ section.id }} .fa-newsform input[type="email"]{
+      width:100%;padding:.75rem 1rem;border-radius:0;border:none;border-bottom:1px solid var(--fa-input-border);
+      background:var(--fa-input-bg);color:var(--fa-input_text, var(--fa-input-text));
+      outline:none;
+    }
+    #footer-advanced-{{ section.id }} .fa-newsform button{
+      padding:.6rem 1rem;border:1px solid var(--fa-btn-border);border-radius:var(--fa-btn-radius);
+      background:var(--fa-btn-bg);color:var(--fa-btn-text);cursor:pointer;white-space:nowrap;
+    }
+    #footer-advanced-{{ section.id }} .fa-newsform button:hover{opacity:.92}
+
+    /* menus */
+    #footer-advanced-{{ section.id }} .fa-menu{list-style:none;margin:0;padding:0;display:grid;gap:.5rem}
+    #footer-advanced-{{ section.id }} .fa-menu li{margin:0}
+
+    /* back to top */
+    #footer-advanced-{{ section.id }} .fa-col--to-top{display:flex;justify-content:flex-end;align-items:flex-start}
+    #footer-advanced-{{ section.id }} .fa-topbtn{
+      display:inline-flex;align-items:center;justify-content:center;
+      width:46px;height:46px;border:1px solid var(--fa-link);background:transparent;border-radius:4px;color:var(--fa-link);
+    }
+    #footer-advanced-{{ section.id }} .fa-topbtn:hover{color:var(--fa-link-hover);border-color:var(--fa-link-hover)}
+
+    /* bottom row */
+    #footer-advanced-{{ section.id }} .fa-row--bottom{grid-template-columns:1fr;border-top:1px solid rgba(255,255,255,.2);padding-top:16px}
+    #footer-advanced-{{ section.id }} .fa-copy{margin:0;color:var(--fa-copy-color);font-size:var(--fa-copy-size);text-align:center}
+
+    /* responsive */
+    @media (max-width: 990px){
+      #footer-advanced-{{ section.id }} .fa-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+      #footer-advanced-{{ section.id }} .fa-col--newsletter{grid-column:1 / -1}
+      #footer-advanced-{{ section.id }} .fa-col--to-top{justify-content:flex-start}
+    }
+    @media (max-width: 640px){
+      #footer-advanced-{{ section.id }} .fa-row{grid-template-columns:1fr}
+      #footer-advanced-{{ section.id }} .fa-col--to-top{justify-content:flex-start}
+    }
+
+    /* a11y helper */
+    #footer-advanced-{{ section.id }} .visually-hidden{
+      position:absolute!important;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0;
+    }
+  </style>
+</section>
+
+{% schema %}
+{
+  "name": "Footer Advanced (5-col)",
+  "settings": [
+    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
+
+    { "type": "color", "id": "bg_color", "label": "Background color", "default": "#111111" },
+    { "type": "color", "id": "text_color", "label": "Body text color", "default": "#ffffff" },
+    { "type": "color", "id": "heading_color", "label": "Heading color", "default": "#ffffff" },
+    { "type": "color", "id": "link_color", "label": "Link color", "default": "#ffffff" },
+    { "type": "color", "id": "link_hover_color", "label": "Link hover color", "default": "#e5e5e5" },
+
+    { "type": "range", "id": "base_font_size", "label": "Base font size (px)", "min": 12, "max": 20, "step": 1, "default": 14 },
+    { "type": "range", "id": "heading_font_size", "label": "Heading font size (px)", "min": 14, "max": 28, "step": 1, "default": 16 },
+
+    { "type": "range", "id": "padding_top", "label": "Padding top (px)", "min": 0, "max": 120, "step": 4, "default": 40 },
+    { "type": "range", "id": "padding_bottom", "label": "Padding bottom (px)", "min": 0, "max": 120, "step": 4, "default": 40 },
+    { "type": "range", "id": "col_gap", "label": "Column gap (px)", "min": 8, "max": 48, "step": 2, "default": 24 },
+    { "type": "range", "id": "row_gap", "label": "Row gap (px)", "min": 8, "max": 48, "step": 2, "default": 20 },
+
+    { "type": "header", "content": "Newsletter" },
+    { "type": "text", "id": "news_heading", "label": "Heading", "default": "Stay in the know" },
+    { "type": "textarea", "id": "news_subheading", "label": "Subheading", "default": "Sign up for 10% off your first order." },
+    { "type": "text", "id": "news_placeholder", "label": "Email placeholder", "default": "Enter email address" },
+    { "type": "text", "id": "news_button_label", "label": "Button label", "default": "Subscribe" },
+
+    { "type": "color", "id": "input_bg", "label": "Email input background", "default": "transparent" },
+    { "type": "color", "id": "input_text", "label": "Email input text", "default": "#ffffff" },
+    { "type": "color", "id": "input_border", "label": "Email input underline", "default": "#d1d5db" },
+
+    { "type": "color", "id": "btn_bg", "label": "Button background", "default": "transparent" },
+    { "type": "color", "id": "btn_text", "label": "Button text", "default": "#ffffff" },
+    { "type": "color", "id": "btn_border", "label": "Button border", "default": "#ffffff" },
+    { "type": "range", "id": "btn_radius", "label": "Button radius (px)", "min": 0, "max": 30, "step": 1, "default": 4 },
+
+    { "type": "header", "content": "Menus" },
+    { "type": "text", "id": "menu_a_heading", "label": "Menu 1 heading", "default": "Shop" },
+    { "type": "link_list", "id": "menu_a", "label": "Menu 1" },
+    { "type": "text", "id": "menu_b_heading", "label": "Menu 2 heading", "default": "Learn" },
+    { "type": "link_list", "id": "menu_b", "label": "Menu 2" },
+    { "type": "text", "id": "menu_c_heading", "label": "Menu 3 heading", "default": "Useful links" },
+    { "type": "link_list", "id": "menu_c", "label": "Menu 3" },
+
+    { "type": "header", "content": "Copyright line" },
+    { "type": "text", "id": "copyright_prefix", "label": "Prefix text", "default": "©" },
+    { "type": "text", "id": "copyright_name", "label": "Brand / owner name", "default": "Your Brand. All rights reserved." },
+    { "type": "text", "id": "copyright_suffix", "label": "Suffix text", "default": "Copyright Text goes here" },
+    { "type": "color", "id": "copyright_color", "label": "Copyright color", "default": "#e5e5e5" },
+    { "type": "range", "id": "copyright_size", "label": "Copyright size (px)", "min": 10, "max": 18, "step": 1, "default": 12 }
+  ],
+  "presets": [
+    { "name": "Footer Advanced (5-col)" }
+  ]
+}
+{% endschema %}
