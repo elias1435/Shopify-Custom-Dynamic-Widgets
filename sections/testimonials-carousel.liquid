@@ -1,0 +1,638 @@
+{% comment %}
+  Testimonials Carousel Section
+  - Title + Subtitle with size/color
+  - Responsive carousel (Desktop/Tablet/Mobile columns)
+  - Auto slide, arrows, pagination, timing, infinite loop
+  - Testimonial block fields (image, stars, title, text, author, company) with per-field typography/alignment
+  - Section background/colors, spacing, full-width or contained
+{% endcomment %}
+
+<section id="tc-{{ section.id }}" class="tc"
+  style="
+    --tc-bg: {{ section.settings.bg | default: 'transparent' }};
+    --tc-text: {{ section.settings.text_color }};
+    --tc-link: {{ section.settings.link_color }};
+    --tc-link-hover: {{ section.settings.link_hover_color }};
+    --tc-pad-t: {{ section.settings.pad_top }}px;
+    --tc-pad-b: {{ section.settings.pad_bottom }}px;
+
+    --tc-title-size: {{ section.settings.title_size }}px;
+    --tc-title-color: {{ section.settings.title_color }};
+    --tc-subtitle-size: {{ section.settings.subtitle_size }}px;
+    --tc-subtitle-color: {{ section.settings.subtitle_color }};
+
+    --tc-card-bg: {{ section.settings.card_bg }};
+    --tc-card-radius: {{ section.settings.card_radius }}px;
+    --tc-card-shadow: {{ section.settings.card_shadow }};
+    --tc-card-border: {{ section.settings.card_border }};
+    --tc-gap: {{ section.settings.card_gap }}px;
+
+    --tc-stars-color: {{ section.settings.stars_color }};
+
+    --tc-arrow-size: {{ section.settings.arrow_size }}px;
+    --tc-arrow-color: {{ section.settings.arrow_color }};
+    --tc-arrow-bg: {{ section.settings.arrow_bg }};
+    --tc-arrow-bg-hover: {{ section.settings.arrow_bg_hover }};
+    --tc-arrow-color-disabled: {{ section.settings.arrow_color_disabled }};
+
+    --tc-dot-size: {{ section.settings.dot_size }}px;
+    --tc-dot-color: {{ section.settings.dot_color }};
+    --tc-dot-active: {{ section.settings.dot_active_color }};
+
+    --tc-cols-d: {{ section.settings.cols_desktop }};
+    --tc-cols-t: {{ section.settings.cols_tablet }};
+    --tc-cols-m: {{ section.settings.cols_mobile }};
+  "
+  data-autoplay="{{ section.settings.autoplay }}"
+  data-interval="{{ section.settings.autoplay_ms }}"
+  data-infinite="{{ section.settings.infinite }}"
+  data-arrows="{{ section.settings.show_arrows }}"
+  data-dots="{{ section.settings.show_dots }}"
+  data-snap="{{ section.settings.snap_scroll }}"
+  data-advance="{{ section.settings.advance_by }}"
+  data-fill="{{ section.settings.fill_last_page }}"
+>
+  <div class="tc-wrap {% if section.settings.full_width %}tc-wrap--full{% else %}tc-wrap--container{% endif %}">
+    {% if section.settings.title != blank or section.settings.subtitle != blank %}
+      <div class="tc-head">
+        {% if section.settings.title != blank %}
+          <h2 class="tc-title" style="text-align: {{ section.settings.title_align }};">{{ section.settings.title }}</h2>
+        {% endif %}
+        {% if section.settings.subtitle != blank %}
+          <p class="tc-subtitle" style="text-align: {{ section.settings.subtitle_align }};">{{ section.settings.subtitle }}</p>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="tc-viewport">
+      <div class="tc-track">
+        {% for block in section.blocks %}
+          {% assign b = block.settings %}
+          <article class="tc-card" {{ block.shopify_attributes }}>
+            {% if b.image != blank %}
+              <div class="tc-media">
+                <img src="{{ b.image | image_url: width: 700 }}" alt="{{ b.image.alt | escape }}" loading="lazy" width="700" height="700">
+              </div>
+            {% endif %}
+
+            {% if b.stars > 0 %}
+              <div class="tc-stars" aria-label="{{ b.stars }} out of 5 stars">
+                {% for i in (1..b.stars) %}
+                  <svg viewBox="0 0 24 24" class="tc-star" aria-hidden="true"><path d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                {% endfor %}
+                {% if b.stars < 5 %}
+                  {% assign empties = 5 | minus: b.stars %}
+                  {% for i in (1..empties) %}
+                    <svg viewBox="0 0 24 24" class="tc-star tc-star--empty" aria-hidden="true"><path d="M22 9.24l-7.19-.62L12 2 9.19 8.62 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zm-10 6.11v-9.5l1.71 4.09 4.47.38-3.39 2.94.99 4.26L12 15.35l-3.78 2.17.99-4.26-3.39-2.94 4.47-.38L12 5.85v9.5z"/></svg>
+                  {% endfor %}
+                {% endif %}
+              </div>
+            {% endif %}
+
+            {% if b.title != blank %}
+              <h3 class="tc-card-title"
+                  style="font-size: {{ b.title_size }}px; color: {{ b.title_color }}; text-align: {{ b.title_align }};">
+                {{ b.title }}
+              </h3>
+            {% endif %}
+
+            {% if b.text != blank %}
+              <p class="tc-card-text"
+                 style="font-size: {{ b.text_size }}px; color: {{ b.text_color }}; text-align: {{ b.text_align }};">
+                {{ b.text }}
+              </p>
+            {% endif %}
+
+            <div class="tc-author"
+                 style="text-align: {{ b.author_align }};">
+              {% if b.author != blank %}
+                <div class="tc-author-name" style="font-size: {{ b.author_size }}px; color: {{ b.author_color }};">{{ b.author }}</div>
+              {% endif %}
+              {% if b.company != blank %}
+                <div class="tc-author-company" style="font-size: {{ b.company_size }}px; color: {{ b.company_color }};">{{ b.company }}</div>
+              {% endif %}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+
+      {% if section.settings.show_arrows %}
+        <button class="tc-arrow tc-arrow--prev" aria-label="{{ 'general.previous' | t }}" data-dir="-1">
+          <span class="tc-arrow-ic" aria-hidden="true">‹</span>
+        </button>
+        <button class="tc-arrow tc-arrow--next" aria-label="{{ 'general.next' | t }}" data-dir="1">
+          <span class="tc-arrow-ic" aria-hidden="true">›</span>
+        </button>
+      {% endif %}
+    </div>
+
+    {% if section.settings.show_dots %}
+      <div class="tc-dots" role="tablist" aria-label="Testimonials pagination"></div>
+    {% endif %}
+  </div>
+
+  <style>
+    #tc-{{ section.id }}{
+      background:var(--tc-bg);
+      color:var(--tc-text);
+      padding:var(--tc-pad-t) 0 var(--tc-pad-b);
+    }
+    #tc-{{ section.id }} .tc-wrap{margin:0 auto; padding:0 20px;}
+    #tc-{{ section.id }} .tc-wrap--container{max-width:1200px;}
+    #tc-{{ section.id }} .tc-head{margin-bottom:24px;}
+    #tc-{{ section.id }} .tc-title{
+      margin:0 0 6px; line-height:1.1; font-size:var(--tc-title-size); color:var(--tc-title-color);
+    }
+    #tc-{{ section.id }} .tc-subtitle{
+      margin:0; font-size:var(--tc-subtitle-size); color:var(--tc-subtitle-color);
+    }
+
+    /* Carousel layout */
+    #tc-{{ section.id }} .tc-viewport{
+      position:relative; overflow:hidden;
+    }
+    #tc-{{ section.id }} .tc-track{
+      display:flex; gap:var(--tc-gap);
+      will-change: transform;
+      transition: transform .45s ease;
+    }
+    #tc-{{ section.id }} .tc-card{
+      background:var(--tc-card-bg);
+      border: var(--tc-card-border);
+      box-shadow: var(--tc-card-shadow);
+      border-radius: var(--tc-card-radius);
+      flex: 0 0 calc((100% - (var(--tc-gap) * (var(--tc-cols-d) - 1))) / var(--tc-cols-d));
+      overflow:hidden;
+    }
+    #tc-{{ section.id }} .tc-media img{display:block; width:100%; height:auto;}
+    #tc-{{ section.id }} .tc-stars{
+      display:flex; gap:3px; padding:14px 16px 0; justify-content: center;
+    }
+    #tc-{{ section.id }} .tc-star{width:20px; height:20px; fill:var(--tc-stars-color);}
+    #tc-{{ section.id }} .tc-star--empty{opacity:.35}
+    #tc-{{ section.id }} .tc-card-title{padding:8px 16px 0; margin:0;}
+    #tc-{{ section.id }} .tc-card-text{padding:6px 16px 0; margin:0;}
+    #tc-{{ section.id }} .tc-author{padding:14px 16px 18px;}
+    #tc-{{ section.id }} .tc-author-name{font-weight:600;}
+    #tc-{{ section.id }} .tc-author-company{opacity:.8;}
+
+    /* Arrows */
+    #tc-{{ section.id }} .tc-arrow{
+      position:absolute; top:50%; transform:translateY(-50%);
+      width: calc(var(--tc-arrow-size) * 2);
+      height: calc(var(--tc-arrow-size) * 2);
+      border-radius: 999px; border:0; cursor:pointer;
+      background: var(--tc-arrow-bg);
+      display:grid; place-items:center;
+    }
+    #tc-{{ section.id }} .tc-arrow:hover{ background: var(--tc-arrow-bg-hover); }
+    #tc-{{ section.id }} .tc-arrow-ic{font-size: var(--tc-arrow-size); line-height:1; color: var(--tc-arrow-color);}
+    #tc-{{ section.id }} .tc-arrow--prev{left:6px;}
+    #tc-{{ section.id }} .tc-arrow--next{right:6px;}
+    #tc-{{ section.id }} .tc-arrow[disabled]{opacity:.5; cursor:not-allowed;}
+    #tc-{{ section.id }} .tc-arrow[disabled] .tc-arrow-ic{color: var(--tc-arrow-color-disabled);}
+
+    /* Dots */
+    #tc-{{ section.id }} .tc-dots{
+      display:flex; gap:10px; justify-content:center; margin-top:16px;
+    }
+    #tc-{{ section.id }} .tc-dot{
+      width:var(--tc-dot-size); height:var(--tc-dot-size);
+      border-radius:999px; background:var(--tc-dot-color); border:0; cursor:pointer; padding: 0;
+    }
+    #tc-{{ section.id }} .tc-dot[aria-selected="true"]{ background: var(--tc-dot-active); }
+
+    /* Responsive columns */
+    @media (max-width: 990px){
+      #tc-{{ section.id }} .tc-card{ flex-basis: calc((100% - (var(--tc-gap) * (var(--tc-cols-t) - 1))) / var(--tc-cols-t)); }
+    }
+    @media (max-width: 640px){
+      #tc-{{ section.id }} .tc-card{ flex-basis: calc((100% - (var(--tc-gap) * (var(--tc-cols-m) - 1))) / var(--tc-cols-m)); }
+    }
+
+    /* Optional scroll-snap (nice for manual swipe) */
+    {% if section.settings.snap_scroll %}
+    #tc-{{ section.id }} .tc-viewport{ scroll-snap-type: x mandatory; overflow-x:auto; }
+    #tc-{{ section.id }} .tc-track{ min-width:100%; }
+    #tc-{{ section.id }} .tc-card{ scroll-snap-align: start; }
+    /* Hide native scrollbar while snappable */
+    #tc-{{ section.id }} .tc-viewport::-webkit-scrollbar{ display:none; }
+    #tc-{{ section.id }} .tc-viewport{ -ms-overflow-style:none; scrollbar-width:none; }
+    {% endif %}
+  </style>
+
+<script>
+(function(){
+  const root = document.getElementById('tc-{{ section.id }}');
+  if(!root) return;
+
+  const viewport = root.querySelector('.tc-viewport');
+  const track = root.querySelector('.tc-track');
+  let cards = Array.from(root.querySelectorAll('.tc-card'));
+  const dotsWrap = root.querySelector('.tc-dots');
+
+  const cfg = {
+    autoplay: root.dataset.autoplay === 'true',
+    interval: parseInt(root.dataset.interval || '5000', 10),
+    infinite: root.dataset.infinite === 'true',
+    showArrows: root.dataset.arrows === 'true',
+    showDots: root.dataset.dots === 'true',
+    advanceBy: root.dataset.advance || 'item',   // 'item' or 'page'
+    fillLast: root.dataset.fill === 'true'
+  };
+
+  let slideIndex = 0; // this will be an item index (not page)
+  let timer = null;
+  let clonesHead = 0;
+  let clonesTail = 0;
+
+  function cols(){
+    const w = root.getBoundingClientRect().width;
+    const d = parseInt(getComputedStyle(root).getPropertyValue('--tc-cols-d'));
+    const t = parseInt(getComputedStyle(root).getPropertyValue('--tc-cols-t'));
+    const m = parseInt(getComputedStyle(root).getPropertyValue('--tc-cols-m'));
+    if (w <= 640) return m;
+    if (w <= 990) return t;
+    return d;
+  }
+  function gap(){ return parseFloat(getComputedStyle(root).getPropertyValue('--tc-gap')) || 0; }
+  function cardSize(){
+    // width of one card + gap to compute step-by-item translation
+    const first = track.querySelector('.tc-card');
+    if(!first) return 0;
+    const rect = first.getBoundingClientRect();
+    return rect.width + gap();
+  }
+  function visible(){ return Math.max(1, cols()); }
+  function stepSize(){
+    return (cfg.advanceBy === 'page') ? visible() : 1;
+  }
+
+  // Optional "fill last page" for nicer page-advancing loops (prevents 5 then only 2)
+  function maybeFillLastPage(){
+    if(!cfg.fillLast || cfg.advanceBy !== 'page') return;
+    const v = visible();
+    const remainder = cards.length % v;
+    if(remainder === 0) return;
+    const need = v - remainder;
+    // clone first 'need' cards to end so every page is full
+    for(let i=0;i<need;i++){
+      const clone = cards[i].cloneNode(true);
+      clone.setAttribute('aria-hidden','true');
+      track.appendChild(clone);
+    }
+    cards = Array.from(track.querySelectorAll('.tc-card'));
+  }
+
+  // Infinite: clone v items to both ends for seamless wrap
+  function makeInfinite(){
+    if(!cfg.infinite) return;
+    const v = visible();
+    // clear old clones if any (on rebuild)
+    track.querySelectorAll('.tc-card[data-clone="1"]').forEach(n=>n.remove());
+    // head clones (from tail)
+    for(let i=0;i<v;i++){
+      const clone = cards[cards.length - v + i].cloneNode(true);
+      clone.dataset.clone = "1";
+      clone.setAttribute('aria-hidden','true');
+      track.insertBefore(clone, track.firstChild);
+    }
+    // tail clones (from head)
+    for(let i=0;i<v;i++){
+      const clone = cards[i].cloneNode(true);
+      clone.dataset.clone = "1";
+      clone.setAttribute('aria-hidden','true');
+      track.appendChild(clone);
+    }
+    clonesHead = v;
+    clonesTail = v;
+  }
+
+  function totalItems(){ return track.querySelectorAll('.tc-card').length; }
+  function realCount(){ return cards.length; } // without edge clones
+
+  function translateTo(index, {animate=true}={}){
+    const x = index * cardSize();
+    track.style.transitionDuration = animate ? '.45s' : '0s';
+    track.style.transform = `translate3d(${-x}px,0,0)`;
+  }
+
+  function goRaw(index, opts){
+    slideIndex = index;
+    translateTo(slideIndex, opts);
+    updateUI();
+  }
+
+  function goNormalized(index, opts){
+    // when infinite with clones, jump across edges seamlessly
+    if(cfg.infinite){
+      const v = visible();
+      const start = clonesHead;              // first real
+      const end = clonesHead + realCount()-1;// last real
+      if(index < start){
+        // jumped to head clones -> snap to equivalent real index near end
+        const mirror = end - ((start - index - 1) % realCount());
+        slideIndex = mirror;
+        translateTo(index, opts); // do the animated move first
+        // after transition ends, snap without animation
+        track.addEventListener('transitionend', function handler(){
+          track.removeEventListener('transitionend', handler);
+          translateTo(slideIndex, {animate:false});
+          updateUI();
+        });
+        return;
+      }else if(index > end){
+        const mirror = start + ((index - end - 1) % realCount());
+        slideIndex = mirror;
+        translateTo(index, opts);
+        track.addEventListener('transitionend', function handler(){
+          track.removeEventListener('transitionend', handler);
+          translateTo(slideIndex, {animate:false});
+          updateUI();
+        });
+        return;
+      }
+    }else{
+      const maxIndex = Math.max(0, realCount() - visible());
+      slideIndex = Math.max(0, Math.min(index, maxIndex));
+      translateTo(slideIndex, opts);
+      updateUI();
+      return;
+    }
+    // within real range
+    slideIndex = index;
+    translateTo(slideIndex, opts);
+    updateUI();
+  }
+
+  function next(){ goNormalized(slideIndex + stepSize(), {animate:true}); }
+  function prev(){ goNormalized(slideIndex - stepSize(), {animate:true}); }
+
+  function buildDots(){
+    if(!cfg.showDots || !dotsWrap) return;
+    dotsWrap.innerHTML = '';
+    if(cfg.advanceBy === 'page'){
+      // pages based on visible cards
+      const v = visible();
+      const pages = Math.ceil(realCount() / v);
+      for(let i=0;i<pages;i++){
+        const b=document.createElement('button');
+        b.className='tc-dot';
+        b.type='button';
+        b.setAttribute('role','tab');
+        b.addEventListener('click',()=> goNormalized(clonesHead + i*v, {animate:true}));
+        dotsWrap.appendChild(b);
+      }
+    }else{
+      // one dot per item (optional). To avoid too many dots, group by page count:
+      const v = visible();
+      const pages = Math.max(1, realCount() - v + 1);
+      for(let i=0;i<pages;i++){
+        const b=document.createElement('button');
+        b.className='tc-dot';
+        b.type='button';
+        b.setAttribute('role','tab');
+        b.addEventListener('click',()=> goNormalized(clonesHead + i, {animate:true}));
+        dotsWrap.appendChild(b);
+      }
+    }
+  }
+
+  function updateDotsSelection(){
+    if(!cfg.showDots || !dotsWrap) return;
+    const v = visible();
+    let pageIdx;
+    if(cfg.advanceBy === 'page'){
+      pageIdx = Math.floor((slideIndex - clonesHead)/v);
+    }else{
+      pageIdx = (slideIndex - clonesHead);
+    }
+    Array.from(dotsWrap.querySelectorAll('.tc-dot')).forEach((b,i)=>{
+      b.setAttribute('aria-selected', String(i===Math.max(0,pageIdx)));
+    });
+  }
+
+  function updateUI(){
+    // arrows state (disable only if not infinite)
+    const prevBtn = root.querySelector('.tc-arrow--prev');
+    const nextBtn = root.querySelector('.tc-arrow--next');
+    if(prevBtn && nextBtn){
+      if(cfg.infinite){
+        prevBtn.removeAttribute('disabled');
+        nextBtn.removeAttribute('disabled');
+      }else{
+        const maxIndex = Math.max(0, realCount() - visible());
+        prevBtn.disabled = slideIndex <= 0;
+        nextBtn.disabled = slideIndex >= maxIndex;
+      }
+    }
+    updateDotsSelection();
+  }
+
+  function start(){
+    if(!cfg.autoplay) return;
+    stop();
+    timer = setInterval(next, cfg.interval);
+  }
+  function stop(){
+    if(timer){ clearInterval(timer); timer=null; }
+  }
+
+  // Rebuild on resize: recalc and re-clone
+  function rebuild(){
+    stop();
+    // Remove all clones first
+    track.querySelectorAll('.tc-card[data-clone="1"]').forEach(n=>n.remove());
+    cards = Array.from(track.querySelectorAll('.tc-card')).filter(n=>n.dataset.clone !== '1');
+    clonesHead = clonesTail = 0;
+
+    maybeFillLastPage();   // optional fill for page mode
+    makeInfinite();        // add edge clones for infinite
+
+    buildDots();
+
+    // Set initial index (after adding head clones)
+    if(cfg.infinite){
+      slideIndex = clonesHead;
+    }else{
+      slideIndex = 0;
+    }
+    translateTo(slideIndex, {animate:false});
+    updateUI();
+    start();
+  }
+
+  // Bind arrows
+  const prevBtn = root.querySelector('.tc-arrow--prev');
+  const nextBtn = root.querySelector('.tc-arrow--next');
+  prevBtn && prevBtn.addEventListener('click', prev);
+  nextBtn && nextBtn.addEventListener('click', next);
+
+  root.addEventListener('mouseenter', stop);
+  root.addEventListener('mouseleave', start);
+  window.addEventListener('visibilitychange', ()=> document.hidden ? stop() : start());
+
+  // Observe size
+  let ro;
+  function onResize(){ rebuild(); }
+  if('ResizeObserver' in window){
+    ro=new ResizeObserver(onResize);
+    ro.observe(root);
+  }else{
+    window.addEventListener('resize', onResize);
+  }
+
+  // INIT
+  rebuild();
+})();
+</script>
+
+</section>
+
+{% schema %}
+{
+  "name": "Testimonials Carousel",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 24,
+  "settings": [
+    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
+
+    { "type": "text", "id": "title", "label": "Section title", "default": "What our customers have to say" },
+    { "type": "range", "id": "title_size", "label": "Title size", "min": 14, "max": 72, "step": 1, "unit": "px", "default": 48 },
+    { "type": "color", "id": "title_color", "label": "Title color", "default": "#223027" },
+    { "type": "select", "id": "title_align", "label": "Title alignment", "default": "center",
+      "options": [
+        {"value":"left","label":"Left"},
+        {"value":"center","label":"Center"},
+        {"value":"right","label":"Right"}
+      ]
+    },
+
+    { "type": "textarea", "id": "subtitle", "label": "Sub title", "default": "from 260 reviews ✅" },
+    { "type": "range", "id": "subtitle_size", "label": "Sub title size", "min": 10, "max": 36, "step": 1, "unit": "px", "default": 16 },
+    { "type": "color", "id": "subtitle_color", "label": "Sub title color", "default": "#6b6b6b" },
+    { "type": "select", "id": "subtitle_align", "label": "Sub title alignment", "default": "center",
+      "options": [
+        {"value":"left","label":"Left"},
+        {"value":"center","label":"Center"},
+        {"value":"right","label":"Right"}
+      ]
+    },
+
+    { "type": "color", "id": "bg", "label": "Section background", "default": "#f5efdf" },
+    { "type": "color", "id": "text_color", "label": "Base text color", "default": "#2a2a2a" },
+    { "type": "color", "id": "link_color", "label": "Link color", "default": "#2a2a2a" },
+    { "type": "color", "id": "link_hover_color", "label": "Link hover color", "default": "#000000" },
+    { "type": "range", "id": "pad_top", "label": "Padding top", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 48 },
+    { "type": "range", "id": "pad_bottom", "label": "Padding bottom", "min": 0, "max": 160, "step": 4, "unit": "px", "default": 60 },
+
+    { "type": "header", "content": "Carousel" },
+    { "type": "range", "id": "cols_desktop", "label": "Columns (desktop)", "min": 1, "max": 6, "step": 1, "default": 5 },
+    { "type": "range", "id": "cols_tablet", "label": "Columns (tablet)", "min": 1, "max": 4, "step": 1, "default": 3 },
+    {"type": "select", "id": "cols_mobile", "label": "Columns (mobile)", "default": "1",
+        "options": [
+            { "value": "1", "label": "1" },
+            { "value": "2", "label": "2" }
+        ]
+        },
+    { "type": "checkbox", "id": "autoplay", "label": "Auto slide", "default": true },
+    { "type": "range", "id": "autoplay_ms", "label": "Slide timing", "min": 2000, "max": 9000, "step": 500, "unit": "ms", "default": 4500 },
+    { "type": "checkbox", "id": "infinite", "label": "Infinite loop", "default": true },
+    { "type": "checkbox", "id": "show_arrows", "label": "Show arrows", "default": true },
+    { "type": "checkbox", "id": "show_dots", "label": "Show pagination dots", "default": true },
+    { "type": "checkbox", "id": "snap_scroll", "label": "Enable touch/scroll snap", "default": true },
+
+    { "type": "header", "content": "Card style" },
+    { "type": "color", "id": "card_bg", "label": "Card background", "default": "#ffffff" },
+    { "type": "text", "id": "card_shadow", "label": "Card shadow", "default": "0 8px 24px rgba(0,0,0,.06)" },
+    { "type": "text", "id": "card_border", "label": "Card border (CSS)", "default": "1px solid rgba(0,0,0,.06)" },
+    { "type": "range", "id": "card_radius", "label": "Card corner radius", "min": 0, "max": 28, "step": 1, "unit": "px", "default": 14 },
+    { "type": "range", "id": "card_gap", "label": "Gap between cards", "min": 0, "max": 40, "step": 1, "unit": "px", "default": 20 },
+
+    { "type": "header", "content": "Stars" },
+    { "type": "color", "id": "stars_color", "label": "Star color", "default": "#2a513a" },
+
+    { "type": "header", "content": "Arrows" },
+    { "type": "range", "id": "arrow_size", "label": "Arrow size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 18 },
+    { "type": "color", "id": "arrow_color", "label": "Arrow icon color", "default": "#223027" },
+    { "type": "color", "id": "arrow_bg", "label": "Arrow background", "default": "#ffffff" },
+    { "type": "color", "id": "arrow_bg_hover", "label": "Arrow hover background", "default": "#f5f5f5" },
+    { "type": "color", "id": "arrow_color_disabled", "label": "Arrow disabled color", "default": "#aaaaaa" },
+
+    { "type": "header", "content": "Dots" },
+    { "type": "range", "id": "dot_size", "label": "Dot size", "min": 4, "max": 16, "step": 1, "unit": "px", "default": 8 },
+    { "type": "color", "id": "dot_color", "label": "Dot color", "default": "#c9c9c9" },
+    { "type": "color", "id": "dot_active_color", "label": "Active dot color", "default": "#223027" },
+
+    { "type": "select", "id": "advance_by", "label": "Advance by", "default": "item",
+    "options": [
+        { "value": "item", "label": "1 item" },
+        { "value": "page", "label": "Page (columns)" }
+    ]
+    },
+    { "type": "checkbox", "id": "fill_last_page", "label": "Fill last page for smooth loop", "default": true },
+
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Image (top)" },
+        { "type": "range", "id": "stars", "label": "Stars", "min": 0, "max": 5, "step": 1, "default": 5 },
+
+        { "type": "text", "id": "title", "label": "Title", "default": "Chennai Bouquet" },
+        { "type": "range", "id": "title_size", "label": "Title size", "min": 12, "max": 28, "step": 1, "unit": "px", "default": 18 },
+        { "type": "color", "id": "title_color", "label": "Title color", "default": "#1f1f1f" },
+        { "type": "select", "id": "title_align", "label": "Title alignment", "default": "center",
+          "options": [
+            {"value":"left","label":"Left"},
+            {"value":"center","label":"Center"},
+            {"value":"right","label":"Right"}
+          ]
+        },
+
+        { "type": "textarea", "id": "text", "label": "Testimonial text", "default": "Thank you for the wonderful arrangement." },
+        { "type": "range", "id": "text_size", "label": "Text size", "min": 12, "max": 22, "step": 1, "unit": "px", "default": 16 },
+        { "type": "color", "id": "text_color", "label": "Text color", "default": "#333333" },
+        { "type": "select", "id": "text_align", "label": "Text alignment", "default": "center",
+          "options": [
+            {"value":"left","label":"Left"},
+            {"value":"center","label":"Center"},
+            {"value":"right","label":"Right"}
+          ]
+        },
+
+        { "type": "text", "id": "author", "label": "Author name", "default": "Customer name" },
+        { "type": "range", "id": "author_size", "label": "Author size", "min": 10, "max": 22, "step": 1, "unit": "px", "default": 14 },
+        { "type": "color", "id": "author_color", "label": "Author color", "default": "#1f1f1f" },
+        { "type": "select", "id": "author_align", "label": "Author alignment", "default": "center",
+          "options": [
+            {"value":"left","label":"Left"},
+            {"value":"center","label":"Center"},
+            {"value":"right","label":"Right"}
+          ]
+        },
+
+        { "type": "text", "id": "company", "label": "Author company", "default": "Company name" },
+        { "type": "range", "id": "company_size", "label": "Company size", "min": 10, "max": 20, "step": 1, "unit": "px", "default": 12 },
+        { "type": "color", "id": "company_color", "label": "Company color", "default": "#777777" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials Carousel",
+      "category": "Testimonials",
+      "blocks": [
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" },
+        { "type": "testimonial" }
+      ]
+    }
+  ]
+}
+{% endschema %}
