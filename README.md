@@ -7,4 +7,4 @@
 ![Preview](https://github.com/elias1435/Shopify-Custom-Dynamic-Widgets/blob/main/testimonials-carousel.liquid.jpg?raw=true)
 
 # footer-advanced.liquid
-![Preview](https://github.com/elias1435/Shopify-Custom-Dynamic-Widgets/blob/main/testimonials-carousel.liquid.jpg?raw=true)
+![Preview](https://github.com/elias1435/Shopify-Custom-Dynamic-Widgets/blob/main/assets/footer-advanced.liquid.jpg?raw=true)
