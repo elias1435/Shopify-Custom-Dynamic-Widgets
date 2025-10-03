@@ -176,9 +176,17 @@
     /* newsletter form */
     #footer-advanced-{{ section.id }} .fa-newsform__row{display:flex;gap:10px;align-items:center}
     #footer-advanced-{{ section.id }} .fa-newsform input[type="email"]{
-      width:100%;padding:.75rem 1rem;border-radius:0;border:none;border-bottom:1px solid var(--fa-input-border);
-      background:var(--fa-input-bg);color:var(--fa-input_text, var(--fa-input-text));
+      width:100%;
+      padding:.75rem 1rem;
+      border-radius:0;
+      border:none;
+      border-bottom:1px solid var(--fa-input-border);
+      background:var(--fa-input-bg);
+      color:var(--fa-input_text, var(--fa-input-text));
       outline:none;
+    }
+    #footer-advanced-{{ section.id }} .fa-newsform input[type="email"]::placeholder{
+      color:var(--fa-input_text, var(--fa-input-text));
     }
     #footer-advanced-{{ section.id }} .fa-newsform button{
       padding:.6rem 1rem;border:1px solid var(--fa-btn-border);border-radius:var(--fa-btn-radius);
