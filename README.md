@@ -8,3 +8,6 @@
 
 # footer-advanced.liquid
 ![Preview](https://github.com/elias1435/Shopify-Custom-Dynamic-Widgets/blob/main/assets/footer-advanced.liquid.jpg?raw=true)
+
+# two-col-slider-carousel.liguid
+![Preview](https://github.com/elias1435/Shopify-Custom-Dynamic-Widgets/blob/main/assets/two-col-slider-carousel.liguid.jpg?raw=true)
