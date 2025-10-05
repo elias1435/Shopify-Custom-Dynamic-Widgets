@@ -1,0 +1,493 @@
+{% assign uid = section.id %}
+
+<section
+  id="pcs-{{ uid }}"
+  class="pcs pcs-{{
+    uid
+  }}{% if section.settings.width_mode == 'full' %} pcs--full{% endif %}"
+  style="
+    --pcs-bg: {{ section.settings.section_bg }};
+    --pcs-pad-top: {{ section.settings.pad_top }}px;
+    --pcs-pad-bottom: {{ section.settings.pad_bottom }}px;
+    --pcs-container: {{ section.settings.container_max }}px;
+
+    --pcs-gap: {{ section.settings.col_gap }}px;
+    --pcs-radius: {{ section.settings.radius }}px;
+
+    /* Left slider */
+    --pcs-speed: {{ section.settings.slider_speed | default : 5000 }};
+    --pcs-show-arrows: {% if section.settings.show_arrows %}1{% else %}0{% endif %};
+    --pcs-show-dots: {% if section.settings.show_dots %}1{% else %}0{% endif %};
+
+    /* Right slider */
+    --pcs-r-speed: {{ section.settings.r_speed | default : 5000 }};
+    --pcs-r-autoplay: {% if section.settings.r_autoplay %}1{% else %}0{% endif %};
+    --pcs-r-show-arrows: {% if section.settings.r_show_arrows %}1{% else %}0{% endif %};
+    --pcs-r-show-dots: {% if section.settings.r_show_dots %}1{% else %}0{% endif %};
+
+    /* Button */
+    --pcs-btn-bg: {{ section.settings.btn_bg }};
+    --pcs-btn-color: {{ section.settings.btn_color }};
+    --pcs-btn-radius: {{ section.settings.btn_radius }}px;
+    --pcs-btn-pad-y: {{ section.settings.btn_pad_y }}px;
+    --pcs-btn-pad-x: {{ section.settings.btn_pad_x }}px;
+    --pcs-btn-size: {{ section.settings.btn_size }};
+  "
+>
+  <div class="pcs__inner">
+    <div class="pcs__grid">
+      {%- comment -%} LEFT: IMAGE SLIDER {%- endcomment -%}
+      <div class="pcs__left">
+        <div class="pcs__viewport" aria-roledescription="carousel">
+          <div class="pcs__track">
+            {% assign left_slides = section.blocks | where: 'type', 'slide' %}
+            {% if left_slides.size > 0 %} {% for block in left_slides %}
+            <div
+              class="pcs__slide"
+              role="group"
+              aria-label="Slide {{ forloop.index }}"
+              {{
+              block.shopify_attributes
+              }}
+            >
+              {% if block.settings.image != blank %}
+              {{ block.settings.image | image_url: width: 1600 | image_tag:
+                      loading: 'lazy',
+                      class: 'pcs__img',
+                      sizes: '(max-width: 990px) 100vw, 50vw',
+                      widths: '600,900,1200,1600',
+                      alt: block.settings.alt | escape }}
+              {% else %}
+              <div class="pcs__placeholder">Add slide image</div>
+              {% endif %}
+            </div>
+            {% endfor %} {% else %}
+            <div class="pcs__slide">
+              <div class="pcs__placeholder">Add slides</div>
+            </div>
+            {% endif %}
+          </div>
+
+          {% if section.settings.show_arrows %}
+          <button class="pcs__nav pcs__prev" aria-label="Previous">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <button class="pcs__nav pcs__next" aria-label="Next">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M9 6l6 6-6 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          {% endif %} {% if section.settings.show_dots %}
+          <div
+            class="pcs__dots"
+            role="tablist"
+            aria-label="Slider navigation"
+          ></div>
+          {% endif %}
+        </div>
+      </div>
+
+      {%- comment -%} RIGHT: 2-column carousel + CTA {%- endcomment -%}
+      <div class="pcs__right">
+        <!-- RIGHT CAROUSEL -->
+        <div class="pcs-r__viewport" aria-roledescription="carousel">
+          <div class="pcs-r__track">
+            {% assign right_items = section.blocks | where: 'type', 'right_item'
+            %} {% if right_items.size > 0 %} {% for block in right_items %}
+            <a
+              class="pcs-r__slide"
+              role="group"
+              aria-label="Right item {{ forloop.index }}"
+              {{
+              block.shopify_attributes
+              }}
+              {%
+              if
+              block.settings.link
+              !="blank"
+              %}href="{{ block.settings.link }}"
+              {%
+              endif
+              %}
+            >
+              {% if block.settings.image != blank %}
+              {{ block.settings.image | image_url: width: 1200 | image_tag:
+                      loading: 'lazy',
+                      class: 'pcs__thumb',
+                      sizes: '(max-width: 990px) 50vw, 25vw',
+                      widths: '400,600,800,1200',
+                      alt: block.settings.alt | escape }}
+              {% else %}
+              <div class="pcs__thumb pcs__placeholder">Right item</div>
+              {% endif %}
+            </a>
+            {% endfor %} {% else %}
+            <!-- Fallback (keeps old two-image behavior if no blocks) -->
+            <a
+              class="pcs-r__slide"
+              {%
+              if
+              section.settings.right_img1_link
+              !="blank"
+              %}href="{{ section.settings.right_img1_link }}"
+              {%
+              endif
+              %}
+            >
+              {% if section.settings.right_img1 != blank %}
+              {{ section.settings.right_img1 | image_url: width: 1200 | image_tag: loading: 'lazy', class: 'pcs__thumb', sizes: '(max-width: 990px) 50vw, 25vw', widths: '400,600,800,1200', alt: section.settings.right_img1_alt | escape }}
+              {% else %}
+              <div class="pcs__thumb pcs__placeholder">Image 1</div>
+              {% endif %}
+            </a>
+            <a
+              class="pcs-r__slide"
+              {%
+              if
+              section.settings.right_img2_link
+              !="blank"
+              %}href="{{ section.settings.right_img2_link }}"
+              {%
+              endif
+              %}
+            >
+              {% if section.settings.right_img2 != blank %}
+              {{ section.settings.right_img2 | image_url: width: 1200 | image_tag: loading: 'lazy', class: 'pcs__thumb', sizes: '(max-width: 990px) 50vw, 25vw', widths: '400,600,800,1200', alt: section.settings.right_img2_alt | escape }}
+              {% else %}
+              <div class="pcs__thumb pcs__placeholder">Image 2</div>
+              {% endif %}
+            </a>
+            {% endif %}
+          </div>
+
+          {% if section.settings.r_show_arrows %}
+          <button class="pcs-r__nav pcs-r__prev" aria-label="Previous">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M15 18l-6-6 6-6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <button class="pcs-r__nav pcs-r__next" aria-label="Next">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M9 6l6 6-6 6"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          {% endif %} {% if section.settings.r_show_dots %}
+          <div
+            class="pcs-r__dots"
+            role="tablist"
+            aria-label="Right slider navigation"
+          ></div>
+          {% endif %}
+        </div>
+
+        <!-- CTA -->
+        <div class="pcs__right-row pcs__right-row--cta">
+          {% if section.settings.btn_label != blank %}
+          <a
+            class="pcs__btn"
+            {%
+            if
+            section.settings.btn_link
+            !="blank"
+            %}href="{{ section.settings.btn_link }}"
+            {%
+            endif
+            %}
+          >
+            {{ section.settings.btn_label }}
+          </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pcs-{{ uid }}{ background:var(--pcs-bg); padding-top:var(--pcs-pad-top); padding-bottom:var(--pcs-pad-bottom); }
+  .pcs-{{ uid }} .pcs__inner{ max-width:var(--pcs-container); margin:0 auto; padding-inline:16px; }
+  .pcs-{{ uid }}.pcs--full .pcs__inner{ max-width:none; width:100%; }
+
+  /* Layout */
+  .pcs-{{ uid }} .pcs__grid{ display:grid; grid-template-columns:1fr 1fr; gap:var(--pcs-gap); align-items:stretch; }
+
+  /* LEFT slider */
+  .pcs-{{ uid }} .pcs__viewport{ position:relative; overflow:hidden; border-radius:var(--pcs-radius); }
+  .pcs-{{ uid }} .pcs__track{ display:flex; transition:transform .5s ease; will-change:transform; }
+  .pcs-{{ uid }} .pcs__slide{ min-width:100%; }
+  .pcs-{{ uid }} .pcs__img{ width:100%; height:auto; display:block; border-radius:var(--pcs-radius); }
+  .pcs-{{ uid }} .pcs__placeholder{ display:grid; place-items:center; background:#e5e7eb; color:#6b7280; min-height:260px; border-radius:var(--pcs-radius); }
+  .pcs-{{ uid }} .pcs__nav{ position:absolute; top:50%; transform:translateY(-50%); width:40px; height:40px; border-radius:999px; border:0; background:#fff; display:grid; place-items:center; box-shadow:0 4px 16px rgba(0,0,0,.12); cursor:pointer; }
+  .pcs-{{ uid }} .pcs__prev{ left:8px; } .pcs-{{ uid }} .pcs__next{ right:8px; }
+  {% unless section.settings.show_arrows %}.pcs-{{ uid }} .pcs__nav{ display:none; }{% endunless %}
+  .pcs-{{ uid }} .pcs__dots{ display:flex; gap:8px; justify-content:center; margin-top:10px; }
+  .pcs-{{ uid }} .pcs__dot{ width:8px; height:8px; border-radius:999px; background:rgba(0,0,0,.25); border:0; cursor:pointer; padding:0;}
+  .pcs-{{ uid }} .pcs__dot.is-active{ background:rgba(0,0,0,.6); }
+  {% unless section.settings.show_dots %}.pcs-{{ uid }} .pcs__dots{ display:none; }{% endunless %}
+
+  /* RIGHT 2-col carousel */
+  .pcs-{{ uid }} .pcs__right{ display:grid; gap:var(--pcs-gap); grid-template-rows:auto 1fr; }
+  .pcs-{{ uid }} .pcs-r__viewport{ position:relative; overflow:hidden; border-radius:var(--pcs-radius); }
+  .pcs-{{ uid }} .pcs-r__track{ display:flex; transition:transform .5s ease; will-change:transform; gap:var(--pcs-gap); padding-inline:calc(var(--pcs-gap)/2); }
+  .pcs-{{ uid }} .pcs-r__slide{ min-width:calc((100% - var(--pcs-gap)) / 2); display:block; }
+  @media (max-width:640px){ .pcs-{{ uid }} .pcs-r__slide{ min-width:100%; } }
+  .pcs-{{ uid }} .pcs__thumb{ width:100%; height:auto; display:block; border-radius:var(--pcs-radius); }
+
+  .pcs-{{ uid }} .pcs-r__nav{ position:absolute; top:50%; transform:translateY(-50%); width:36px; height:36px; border-radius:999px; border:0; background:#fff; display:grid; place-items:center; box-shadow:0 4px 16px rgba(0,0,0,.12); cursor:pointer; }
+  .pcs-{{ uid }} .pcs-r__prev{ left:8px; } .pcs-{{ uid }} .pcs-r__next{ right:8px; }
+  {% unless section.settings.r_show_arrows %}.pcs-{{ uid }} .pcs-r__nav{ display:none; }{% endunless %}
+  .pcs-{{ uid }} .pcs-r__dots{ display:flex; gap:8px; justify-content:center; margin-top:10px;}
+  .pcs-{{ uid }} .pcs-r__dot{ width:8px; height:8px; border-radius:999px; background:rgba(0,0,0,.25); border:0; cursor:pointer; padding:0;}
+  .pcs-{{ uid }} .pcs-r__dot.is-active{ background:rgba(0,0,0,.6); }
+  {% unless section.settings.r_show_dots %}.pcs-{{ uid }} .pcs-r__dots{ display:none; }{% endunless %}
+
+  /* CTA */
+  .pcs-{{ uid }} .pcs__right-row--cta{ display:grid; place-items:center; }
+  .pcs-{{ uid }} .pcs__btn{ display:inline-block; text-decoration:none; text-align:center; background:var(--pcs-btn-bg); color:var(--pcs-btn-color); padding:var(--pcs-btn-pad-y) var(--pcs-btn-pad-x); border-radius:var(--pcs-btn-radius); width:min(100%, var(--pcs-btn-size)); font-weight:600; letter-spacing:.04em; }
+
+  @media (max-width:990px){ .pcs-{{ uid }} .pcs__grid{ grid-template-columns:1fr; } }
+</style>
+
+<script>
+  (function(){
+    const root = document.getElementById('pcs-{{ uid }}');
+    if(!root) return;
+
+    /* ---------------- LEFT SLIDER (infinite optional) ---------------- */
+    const lTrack = root.querySelector('.pcs__track');
+    const lDotsWrap = root.querySelector('.pcs__dots');
+    const lPrevBtn = root.querySelector('.pcs__prev');   // renamed
+    const lNextBtn = root.querySelector('.pcs__next');   // renamed
+    const lSpeed = parseInt(getComputedStyle(root).getPropertyValue('--pcs-speed')) || 5000;
+    const lInfinite = {{ section.settings.l_infinite | default: true | json }};
+
+    let lBase = Array.from(lTrack.querySelectorAll('.pcs__slide'));  // originals
+    let lIdx = 0, lTimer = null, lCloning = false;
+
+    function lPages(){ return lBase.length || 1; }
+    function lCleanup(){ lTrack.querySelectorAll('.pcs__slide[data-clone]').forEach(n=>n.remove()); lCloning=false; }
+    function lSetup(){
+      lCleanup();
+      if(!lInfinite || lBase.length < 2){ lCloning=false; lGoTo(0); return; }
+      const first = lBase[0].cloneNode(true), last = lBase[lBase.length-1].cloneNode(true);
+      first.dataset.clone='1'; last.dataset.clone='1';
+      lTrack.appendChild(first); lTrack.insertBefore(last, lTrack.firstChild);
+      lCloning = true;
+      lTrack.style.transition='none'; lTrack.style.transform='translateX(-100%)';
+      requestAnimationFrame(()=>{ lTrack.style.transition=''; });
+      lIdx = 0;
+    }
+    function lBuildDots(){
+      if(!lDotsWrap) return;
+      lDotsWrap.innerHTML = '';
+      for(let i=0;i<lPages();i++){
+        const b=document.createElement('button');
+        b.className='pcs__dot'+(i===0?' is-active':'');
+        b.setAttribute('role','tab');
+        b.addEventListener('click',()=>{ lIdx=i; lGoTo(lIdx); lRestart(); });
+        lDotsWrap.appendChild(b);
+      }
+    }
+    function lUpdDots(){
+      if(!lDotsWrap) return;
+      const dots=[...lDotsWrap.querySelectorAll('.pcs__dot')];
+      dots.forEach((d,i)=> d.classList.toggle('is-active', i === ((lIdx%lPages())+lPages())%lPages()));
+    }
+    function lGoTo(p,{auto=false}={}){
+      const pages=lPages(); lIdx=((p%pages)+pages)%pages;
+      const visual = lCloning ? lIdx+1 : lIdx;
+      lTrack.style.transform = `translateX(-${visual*100}%)`;
+      lUpdDots();
+      if(lCloning){
+        const onEnd=()=>{ lTrack.removeEventListener('transitionend', onEnd);
+          lTrack.style.transition='none';
+          lTrack.style.transform=`translateX(-${(lIdx+1)*100}%)`;
+          requestAnimationFrame(()=>{ lTrack.style.transition=''; if(auto) lRestart(); });
+        };
+        lTrack.addEventListener('transitionend', onEnd, { once:true });
+      } else if(auto){ lRestart(); }
+    }
+    function lNextPage(auto=false){ lGoTo(lIdx+1,{auto}); }   // renamed
+    function lPrevPage(){ lGoTo(lIdx-1); }                    // renamed
+    function lRestart(){ clearInterval(lTimer); if(lSpeed>0){ lTimer=setInterval(()=>lNextPage(true), lSpeed); } }
+
+    lPrevBtn && lPrevBtn.addEventListener('click', ()=>{ lPrevPage(); lRestart(); });
+    lNextBtn && lNextBtn.addEventListener('click', ()=>{ lNextPage(true); lRestart(); });
+    root.addEventListener('mouseenter', ()=> clearInterval(lTimer));
+    root.addEventListener('mouseleave', lRestart);
+
+    lBuildDots(); lSetup(); lRestart();
+    window.addEventListener('resize', ()=>{ lBase = Array.from(lTrack.querySelectorAll('.pcs__slide')).filter(n=>!n.dataset.clone); lBuildDots(); lSetup(); });
+
+    /* --------------- RIGHT 2-COL CAROUSEL (infinite optional) --------------- */
+    const rTrack = root.querySelector('.pcs-r__track');
+    const rDotsWrap = root.querySelector('.pcs-r__dots');
+    const rPrevBtn = root.querySelector('.pcs-r__prev');     // renamed
+    const rNextBtn = root.querySelector('.pcs-r__next');     // renamed
+    const rSpeed = parseInt(getComputedStyle(root).getPropertyValue('--pcs-r-speed')) || 5000;
+    const rAutoplay = getComputedStyle(root).getPropertyValue('--pcs-r-autoplay').trim()==='1';
+    const rInfinite = {{ section.settings.r_infinite | default: true | json }};
+
+    let rBase = Array.from(root.querySelectorAll('.pcs-r__slide')).filter(n=>!n.dataset.clone);
+    let rIdx=0, rTimer=null, rCloning=false;
+
+    function rPerView(){ return window.matchMedia('(max-width:640px)').matches ? 1 : 2; }
+    function rPages(){ return Math.max(1, Math.ceil(rBase.length / rPerView())); }
+
+    function rCleanup(){ rTrack.querySelectorAll('.pcs-r__slide[data-clone]').forEach(n=>n.remove()); rCloning=false; }
+    function rSetup(){
+      rCleanup();
+      if(!rInfinite || rBase.length <= rPerView()){ rCloning=false; rGoTo(0); return; }
+      const p=rPerView();
+      const first = rBase.slice(0,p).map(n=>{ const c=n.cloneNode(true); c.dataset.clone='1'; return c; });
+      const last  = rBase.slice(-p).map(n=>{ const c=n.cloneNode(true); c.dataset.clone='1'; return c; });
+      first.forEach(n=>rTrack.appendChild(n));
+      last.forEach(n=>rTrack.insertBefore(n, rTrack.firstChild));
+      rCloning=true;
+      rTrack.style.transition='none'; rTrack.style.transform='translateX(-100%)';
+      requestAnimationFrame(()=>{ rTrack.style.transition=''; });
+      rIdx=0;
+    }
+    function rBuildDots(){
+      if(!rDotsWrap) return; rDotsWrap.innerHTML=''; const pages=rPages();
+      for(let i=0;i<pages;i++){
+        const b=document.createElement('button');
+        b.className='pcs-r__dot'+(i===0?' is-active':'');
+        b.setAttribute('role','tab');
+        b.addEventListener('click',()=>{ rIdx=i; rGoTo(rIdx); rRestart(); });
+        rDotsWrap.appendChild(b);
+      }
+    }
+    function rUpdDots(){
+      if(!rDotsWrap) return;
+      const pages=rPages();
+      rDotsWrap.querySelectorAll('.pcs-r__dot').forEach((d,i)=> d.classList.toggle('is-active', i === ((rIdx%pages)+pages)%pages));
+    }
+    function rGoTo(p,{auto=false}={}){
+      const pages=rPages(); rIdx=((p%pages)+pages)%pages;
+      const visual = rCloning ? rIdx+1 : rIdx;
+      rTrack.style.transform=`translateX(-${visual*100}%)`;
+      rUpdDots();
+      if(rCloning){
+        const onEnd=()=>{ rTrack.removeEventListener('transitionend', onEnd);
+          rTrack.style.transition='none'; rTrack.style.transform=`translateX(-${(rIdx+1)*100}%)`;
+          requestAnimationFrame(()=>{ rTrack.style.transition=''; if(auto) rRestart(); });
+        };
+        rTrack.addEventListener('transitionend', onEnd, { once:true });
+      } else if(auto){ rRestart(); }
+    }
+    function rNextPage(){ rGoTo(rIdx+1); }                   // renamed
+    function rPrevPage(){ rGoTo(rIdx-1); }                   // renamed
+    function rRestart(){ clearInterval(rTimer); if(rAutoplay && rSpeed>0){ rTimer=setInterval(()=>rGoTo(rIdx+1,{auto:true}), rSpeed); } }
+
+    rPrevBtn && rPrevBtn.addEventListener('click', ()=>{ rPrevPage(); rRestart(); });
+    rNextBtn && rNextBtn.addEventListener('click', ()=>{ rNextPage(); rRestart(); });
+    root.addEventListener('mouseenter', ()=> clearInterval(rTimer));
+    root.addEventListener('mouseleave', rRestart);
+
+    function rInit(){ rBase = Array.from(root.querySelectorAll('.pcs-r__slide')).filter(n=>!n.dataset.clone); rBuildDots(); rSetup(); rRestart(); }
+    rInit();
+    window.addEventListener('resize', ()=>{ rInit(); });
+  })();
+</script>
+
+{% schema %} { "name": "2-Col Slider + CTA", "settings": [ { "type": "color",
+"id": "section_bg", "label": "Section background", "default": "#e7e0c7" }, {
+"type": "range", "id": "pad_top", "label": "Top spacing", "min": 0, "max": 160,
+"step": 4, "default": 40 }, { "type": "range", "id": "pad_bottom", "label":
+"Bottom spacing", "min": 0, "max": 160, "step": 4, "default": 40 }, { "type":
+"select", "id": "width_mode", "label": "Section width", "default": "container",
+"options": [ { "value": "container", "label": "Container (max width)" }, {
+"value": "full", "label": "Full width" } ]}, { "type": "range", "id":
+"container_max", "label": "Container max width (px)", "min": 900, "max": 1800,
+"step": 20, "default": 1200 }, { "type": "range", "id": "col_gap", "label": "Gap
+between columns (px)", "min": 0, "max": 48, "step": 2, "default": 24 }, {
+"type": "range", "id": "radius", "label": "Image/button radius (px)", "min": 0,
+"max": 40, "step": 2, "default": 12 }, { "type": "header", "content": "Left
+slider" }, { "type": "checkbox", "id": "l_infinite", "label": "Infinite loop",
+"default": true }, { "type": "range", "id": "slider_speed", "label": "Autoplay
+speed (ms)", "min": 0, "max": 9000, "step": 250, "default": 5000 }, { "type":
+"checkbox", "id": "show_arrows", "label": "Show arrows", "default": true }, {
+"type": "checkbox", "id": "show_dots", "label": "Show bullets", "default": true
+}, { "type": "header", "content": "Right carousel (top row)" }, { "type":
+"checkbox", "id": "r_infinite", "label": "Infinite loop", "default": true }, {
+"type": "checkbox", "id": "r_autoplay", "label": "Autoplay", "default": true },
+{ "type": "range", "id": "r_speed", "label": "Autoplay speed (ms)", "min": 0,
+"max": 9000, "step": 250, "default": 5000 }, { "type": "checkbox", "id":
+"r_show_arrows", "label": "Show arrows", "default": true }, { "type":
+"checkbox", "id": "r_show_dots", "label": "Show bullets", "default": true }, {
+"type": "header", "content": "Right images (fallback when no blocks)" }, {
+"type": "image_picker", "id": "right_img1", "label": "Right image 1" }, {
+"type": "text", "id": "right_img1_alt", "label": "Right image 1 alt" }, {
+"type": "url", "id": "right_img1_link", "label": "Right image 1 link" }, {
+"type": "image_picker", "id": "right_img2", "label": "Right image 2" }, {
+"type": "text", "id": "right_img2_alt", "label": "Right image 2 alt" }, {
+"type": "url", "id": "right_img2_link", "label": "Right image 2 link" }, {
+"type": "header", "content": "Button (bottom row)" }, { "type": "text", "id":
+"btn_label", "label": "Button label", "default": "GET THE DECK" }, { "type":
+"url", "id": "btn_link", "label": "Button link" }, { "type": "color", "id":
+"btn_bg", "label": "Button background", "default": "#173d1e" }, { "type":
+"color", "id": "btn_color", "label": "Button text color", "default": "#ffffff"
+}, { "type": "range", "id": "btn_radius", "label": "Button radius (px)", "min":
+0, "max": 40, "step": 1, "default": 8 }, { "type": "range", "id": "btn_pad_y",
+"label": "Button padding Y (px)", "min": 8, "max": 32, "step": 1, "default": 16
+}, { "type": "range", "id": "btn_pad_x", "label": "Button padding X (px)",
+"min": 16, "max": 64, "step": 2, "default": 28 }, { "type": "text", "id":
+"btn_size", "label": "Button max width (e.g. 480px or 100%)", "default": "520px"
+} ], "blocks": [ { "type": "slide", "name": "Slide (left)", "settings": [ {
+"type": "image_picker", "id": "image", "label": "Slide image" }, { "type":
+"text", "id": "alt", "label": "Alt text" } ] }, { "type": "right_item", "name":
+"Right item", "settings": [ { "type": "image_picker", "id": "image", "label":
+"Right image" }, { "type": "text", "id": "alt", "label": "Alt text" }, { "type":
+"url", "id": "link", "label": "Link (optional)" } ] } ], "max_blocks": 20,
+"presets": [{ "name": "Two Column • Slider + CTA" }] } {% endschema %}
